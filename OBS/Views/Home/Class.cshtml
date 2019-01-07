@@ -1,0 +1,398 @@
+﻿
+@{
+    ViewBag.Title = "Sınıflar - ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    td.details-control {
+        background: url('https://datatables.net/examples/resources/details_open.png') no-repeat center center;
+        cursor: pointer;
+    }
+
+    tr.shown td.details-control {
+        background: url('https://datatables.net/examples/resources/details_close.png') no-repeat center center;
+    }
+</style>
+<div class="row" ng-app="">
+    <div class="col-md-12">
+
+        <div class="card">
+            <div class="card-header header-elements-inline">
+                <h5 class="card-title">Sınıflar</h5>
+            </div>
+
+            <div class="card-body">
+                <p><button id="add" type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"><i class="icon-plus2"></i>Yeni Sınıf Ekle</button></p>
+            </div>
+
+            <!-- Vertical form modal -->
+            <div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="true" style="z-index: 1050; display: none;" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Yeni Sınıf Ekle</h5>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <form id="form">
+                            <div class="modal-body">
+
+                                <input type="text" id="ID" hidden="" class="form-control">
+
+                                <div class="form-group">
+                                    <label>Sınıf Adı</label>
+                                    <input type="text" id="ClassName" class="form-control" placeholder="Sınıf Adı">
+                                </div>
+                                <div class="form-group">
+                                    <label>Sınıf Öğretmeni</label>
+                                    <select id="TeacherID" class="form-control select-fixed-single"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Dersleri Seç</label>
+                                    <select id="LessonsId" class="form-control " multiple="multiple"></select>
+
+                                </div>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                                <button type="submit" class="btn btn-primary">Kaydet <i class="icon-database-check ml-2"></i></button>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- /vertical form modal -->
+
+            <table id="examples" class="table table-bordered table-hover datatable-highlight dataTable no-footer" style="width: 100%"></table>
+
+
+
+        </div>
+
+
+
+    </div>
+
+</div>
+
+@section scripts{
+
+
+    <script>
+
+        $(document).ready(function () {
+            $.select2Ajax.VeriCek("#TeacherID", "/json/select2/teachers");
+
+            $("#LessonsId").select2({
+                ajax: {
+                    url: '/json/select2/lessons',
+                    dataType: 'json',
+                    processResults: function (data) {
+                        return {
+                            results: data.items
+                        };
+                    },
+                    cache: true
+                },
+                tags: true,
+                tokenSeparators: [',', '+'],
+                placeholder: "Dersleri Seç",
+                escapeMarkup: function (markup) { return markup; },
+                templateResult: formatRepo,
+                templateSelection: formatRepoSelection
+            });
+
+            function formatRepo(repo) {
+                if (repo.loading) {
+                    return repo.text;
+                }
+                var markup = "<div class='select2-result-repository__title'>" + repo.text + "</div>";
+                return markup;
+            }
+            function formatRepoSelection(repo) {
+                return repo.text || repo.description;
+            }
+            $("#select").click(function (e) {
+                var dersId = [];
+
+                dersId.push({
+                    ID: $("#LessonsId").val().split(",")
+                });
+
+                console.log(dersId);
+            });
+
+
+            var tableHTML = '';
+            function format(d) {
+                if (d.Lessons.length !== 0) {
+                    tableHTML =
+                        '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered">' +
+                        '<td colspan="8"><b><i class="icon-books"></i> Dersler ' +
+                        '</b></td>' +
+                        '<tr>' +
+                        '<th width="85%">' +
+                        'Ders Adı' +
+                        '</th>' +
+                        '</tr>';
+                    for (var i = 0; i < d.Lessons.length; i++) {
+
+                        tableHTML +=
+                            '<tr>' +
+                            '<td>' +
+                            d.Lessons[i].LessonName +
+                            '</td>' +
+                            '</tr>';
+                    }
+                    tableHTML += '</table>';
+                } else {
+                    tableHTML += "Ders eklenemiştir.";
+                }
+               
+                return tableHTML;
+            }
+
+            var table = $('#examples').DataTable({
+                "ajax": {
+                    "url": "/json/class",
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "paging": false,
+                "columns": [
+                    {
+                        "title": "#",
+                        "className": 'details-control',
+                        "orderable": false,
+                        "data": null,
+                        "defaultContent": ''
+                    },
+                    { "width": "2%", "title": "#ID", "data": "ID" },
+                    { "title": "Sınıf Adı", "data": "ClassName", "autoWidth": true },
+                    { "title": "Sınıf Öğretmeni", "data": "Teacher", "autoWidth": true },
+                    { "title": "Sınıf Dersleri", "data": "Lessons[,].LessonName", "autoWidth": true },
+                    {
+                        "title": "Seçenekler",
+                        "data": "ID",
+                        "width": "5%",
+                        "searchable": true,
+                        "sortable": true,
+                        "processing": true,
+                        "serverSide": true,
+                        "render": function (data, type, full, meta) {
+                            return '<div class="list-icons">' +
+                                '										<div class="dropdown">' +
+                                '											<a class="list-icons-item" data-toggle="dropdown" aria-expanded="false">' +
+                                '												<i class="icon-menu9"></i>' +
+                                '											</a>' +
+                                '' +
+                                '											<div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-158px, 19px, 0px); top: 0px; left: 0px; will-change: transform;">' +
+                                '												<a data-id=' +
+                                data +
+                                ' class="update-link dropdown-item"><i class="icon-pen6"></i> Düzenle</a>' +
+                                '												<a data-id=' +
+                                data +
+                                ' class="delete-link dropdown-item"><i class="icon-trash"></i> Sil</a>' +
+                                '											</div>' +
+                                '										</div>' +
+                                '									</div>';
+                        }
+                    }
+                ],
+                autoWidth: false,
+                dom:
+                    '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
+                "order":
+                    [[1, "desc"]],
+                "language":
+                {
+                    "url":
+                        "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json"
+                }
+            });
+
+
+            $('#examples tbody').on('click',
+                'td.details-control',
+                function () {
+                    var tr = $(this).closest('tr');
+                    var row = table.row(tr);
+                    if (row.child.isShown()) {
+                        row.child.hide();
+                        tr.removeClass('shown');
+                    } else {
+                        row.child(format(row.data())).show();
+                        tr.addClass('shown');
+                    }
+                });
+
+
+            $("#add").click(function (e) {
+                $("#form")[0].reset();
+                $('#TeacherID').val(null).trigger('change');
+                $('#LessonsId').val(null).trigger('change');    
+                $(".modal-title").html("Sınıf Ekle");
+            });
+
+            $("form").submit(function (e) {
+                e.preventDefault();
+
+
+                var isValidate = false;
+
+                function formKontrol() {
+
+                    if ($('#ClassName').val().length <= 0) {
+                        $("#ClassName").attr("placeholder", "Zorunlu Alan (*)").focus();
+                        isValidate = false;
+                    } else
+                        isValidate = true;
+                };
+
+                formKontrol();
+                if (isValidate === true) {
+                    var data = new Object();
+                    if ($('#ID').val().length >= 1) {
+                        data.ID = $('#ID').val();
+                    }
+                    data.ClassName = $('#ClassName').val();
+                    data.TeacherID = $('#TeacherID').val();
+                    $.ajax({
+                        type: "POST",
+                        url: "/class/add",
+                        data: JSON.stringify({ cls: data, lessons: $("#LessonsId").val().toString().split(",") }),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (response) {
+                            if (response === "Success") {
+                                $.iziToast.Success();
+                                $("#examples").DataTable().ajax.reload();
+                                $("#myModal").modal('hide');
+                            } else if (response === "Update") {
+                                $.iziToast.Success();
+                                $("#examples").DataTable().ajax.reload();
+                                $("#myModal").modal('hide');
+                            } else if (response === "Saved") {
+                                iziToast.info({
+                                    title: 'Bilgi',
+                                    message: 'Bu sınıf daha önce sisteme kaydedilmiştir.'
+                                });
+                            } else {
+                                iziToast.warning({
+                                    title: 'Hata',
+                                    message: 'Lütfen tekrar deneyiniz.'
+                                });
+                                alert(response);
+                            }
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                }
+
+
+            });
+
+
+            $('#examples tbody').on('click',
+                'a.delete-link',
+                function () {
+                    var id = $(this).attr("data-id");
+                    iziToast.question({
+                        timeout: 20000,
+                        close: false,
+                        overlay: true,
+                        displayMode: 'once',
+                        id: 'question',
+                        zindex: 999,
+                        title: 'Dikkat',
+                        message: 'Silmek istediğinize emin misiniz?',
+                        position: 'center',
+                        buttons: [
+                            ['<button><b>Evet</b></button>', function (instance, toast) {
+                                $.ajax({
+                                    type: "POST",
+                                    url: '/class/delete/' + id,
+                                    success: function (response) {
+                                        if (response === "Success") {
+                                            iziToast.success({
+                                                title: 'Başarılı',
+                                                message: 'Silme işleminiz gerçekleşmiştir.'
+                                            });
+                                            $("#examples").DataTable().ajax.reload();
+                                        } else {
+                                            iziToast.warning({
+                                                title: 'Hata',
+                                                message: 'Lütfen tekrar deneyiniz.'
+                                            });
+                                        }
+                                    }
+                                });
+                                instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                            }, true],
+                            ['<button>Hayır</button>', function (instance, toast) {
+
+                                instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                            }],
+                        ]
+                    });
+
+                });
+
+            $('#examples tbody').on('click',
+                'a.update-link',
+                function () {
+                    var id = $(this).attr("data-id");
+                    $.ajax({
+                        url: '/class/details/' + id,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            $(".modal-title").html("Güncelle");
+                            $("#ID").val(data.data[0].ID);
+                            $("#ClassName").val(data.data[0].ClassName);
+
+                            $("#TeacherID").select2("trigger",
+                                "select",
+                                { data: { text: data.data[0].Teacher, id: data.data[0].TeacherId } });
+                            var array = [];
+                            for (var i = 0; i < data.data[0].Lessons.length; i++) {
+                                array.push({
+                                    id: data.data[0].Lessons[i].ID,
+                                    text: data.data[0].Lessons[i].LessonName
+                                });
+                              
+                            }
+                            $.each(array,
+                                function (k, v) {
+                                    $("#LessonsId").select2("trigger",
+                                        "select",
+                                        { data: { text: v.text, id: v.id } });
+                                });
+
+                            $("#myModal").modal('show');
+
+                        },
+                        error: function (err) {
+                            alert("Error: " + err.responseText);
+                        }
+                    });
+
+
+                });
+
+
+        });
+    </script>
+
+}
+
+

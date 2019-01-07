@@ -1,0 +1,108 @@
+﻿@{
+    ViewBag.Title = "";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Öğrenci Bilgi Sistemi </title>
+
+    <!-- Global stylesheets -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
+    <link href="~/Content/assets/css/icons/icomoon/styles.css" rel="stylesheet" type="text/css">
+    <link href="~/Content/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="~/Content/assets/css/bootstrap_limitless.min.css" rel="stylesheet" type="text/css">
+    <link href="~/Content/assets/css/layout.min.css" rel="stylesheet" type="text/css">
+    <link href="~/Content/assets/css/components.min.css" rel="stylesheet" type="text/css">
+    <link href="~/Content/assets/css/colors.min.css" rel="stylesheet" type="text/css">
+    <link href="~/Content/assets/css/iziToast.min.css" rel="stylesheet" type="text/css">
+
+    <!-- Core JS files -->
+    <script src="~/Content/assets/js/main/jquery.min.js"></script>
+    <script src="~/Content/assets/js/main/bootstrap.bundle.min.js"></script>
+    <script src="~/Content/assets/js/plugins/loaders/blockui.min.js"></script>
+    <!-- /core JS files -->
+    <!-- Theme JS files -->
+    <script src="~/Content/assets/js/app.js"></script>
+    <script src="~/Content/assets/js/iziToast.min.js"></script>
+    <script src="~/Content/assets/js/plugins/forms/selects/select2.min.js"></script>
+    <script src="~/Content/assets/js/plugins/tables/datatables/datatables.min.js"></script>
+
+    <script src="~/Content/assets/js/demo_pages/datatables_basic.js"></script>
+
+    <!-- /theme JS files -->
+    <script src="~/Content/assets/js/angular.min.js"></script>
+    <script src="~/Scripts/obs.js"></script>
+
+    <script src="https://unpkg.com/gijgo@1.9.11/js/gijgo.min.js" type="text/javascript"></script>
+    <link href="https://unpkg.com/gijgo@1.9.11/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+    <!-- /global stylesheets -->
+
+
+</head>
+<body>
+
+
+    @Html.Partial("Partial/_Navbar")
+
+    <div class="page-content">
+
+        
+        <div class="content-wrapper">
+        
+            <div class="content d-flex justify-content-center align-items-center">
+
+                <!-- Container -->
+                <div class="flex-fill">
+
+                    <!-- Error title -->
+                    <div class="text-center mb-3">
+                        @if (Response.StatusCode == 403)
+                        {
+                            <h1 class="error-title">403</h1>
+                            <h5>Dikkat, bu sayfayı görüntülemeniz için yetkiniz yoktur!</h5>
+                        }
+                        else
+                        {
+                            <h1 class="error-title">404</h1>
+                            <h5>Üzgünüm, aradığınızı bulamadık!</h5>
+                   
+                        }
+
+                    </div>
+                    <!-- /error title -->
+
+
+                    <!-- Error content -->
+                    <div class="row">
+                        <div class="col-xl-4 offset-xl-4 col-md-6 offset-md-3">
+
+                            <!-- Buttons -->
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <a href="/" class="btn btn-primary btn-block"><i class="icon-home4 mr-2"></i> Anasayfa</a>
+                                </div>
+                            </div>
+                            <!-- /buttons -->
+							
+                        </div>
+                    </div>
+                    <!-- /error wrapper -->
+
+                </div>
+                <!-- /container -->
+
+            </div>
+            @Html.Partial("Partial/_Footer")
+        </div>
+    </div>
+
+</body>
+</html>
+
+

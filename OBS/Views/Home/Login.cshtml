@@ -1,0 +1,147 @@
+﻿@{
+    ViewBag.Title = "Giriş Yap - ";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<!-- Login form -->
+<form class="login-form wmin-sm-400" id="form">
+    <div class="card mb-0">
+        
+        <div class="card-body">
+            <div class="tab-pane fade show active">
+                <div class="text-center mb-3">
+                    <img class="img-circle mr-2 mt-1" width="50%" height="50%" src="~/Content/assets/images/logo.png" />
+                    @*<i class="icon-reading icon-2x text-slate-300 border-slate-300 border-3 rounded-round p-3 mb-3 mt-1"></i>*@
+                    <h5 class="mb-0">Abaküs Öğrenci Bilgi Sistemi</h5>
+                    <span class="d-block text-muted">Bilgilerinizi doldurarak giriş yapabilirsiniz.</span>
+                </div>
+
+                <div class="form-group form-group-feedback form-group-feedback-left">
+                    <input type="text" id="username" class="form-control" placeholder="Kullanıcı Adınız veya Öğrenci Numaranız">
+                    <div class="form-control-feedback">
+                        <i class="icon-user text-muted"></i>
+                    </div>
+                </div>
+
+                <div class="form-group form-group-feedback form-group-feedback-left">
+                    <input type="password" id="password" class="form-control" placeholder="Şifreniz">
+                    <div class="form-control-feedback">
+                        <i class="icon-lock2 text-muted"></i>
+                    </div>
+                </div>
+
+                <div class="form-group d-flex align-items-center">
+                    <div class="form-check mb-0">
+                        <label class="form-check-label">
+                            <input type="checkbox" name="remember" class="form-input-styled" checked data-fouc>
+                            Beni Hatırla
+                        </label>
+                    </div>
+                    
+                    <a href="#" class="ml-auto">Şifremi unuttum?</a>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" id="btnSubmit" class="btn btn-primary btn-block">Giriş Yap</button>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</form>
+<!-- /login form -->
+
+@section scripts{
+    <link href="~/Content/assets/css/extras/animate.min.css" rel="stylesheet" type="text/css">
+
+    <script src="~/Content/assets/js/demo_pages/animations_css3.js"></script>
+
+    <script>
+
+    function sendLove(this1) {
+            this1.disabled = true;
+            this1.innerHTML = '<i class="icon-spinner2 spinner"> </i>  &nbsp; Giriş yapılıyor...';
+        }
+
+        function sendLove2(this1) {
+            this1.disabled = false;
+            this1.innerHTML = 'Giriş Yap';
+        }
+
+        var isValidate = false;
+
+        function formKontrol() {
+
+            if ($('#username').val().length <= 0) {
+                $("#username").attr("placeholder", "Zorunlu Alan (*)").focus();
+                isValidate = false;
+            }else if ($('#password').val().length <= 0) {
+                $("#password").attr("placeholder", "Zorunlu Alan (*)").focus();
+                isValidate = false;
+            } else
+                isValidate = true;
+        };
+
+    $("#btnSubmit").click(function (e) {
+        e.preventDefault();
+
+            formKontrol();
+            if (isValidate === true) {
+                var user = new Object();
+                user.Username = $('#username').val();
+                user.Password = $('#password').val();
+                sendLove(this);
+                var btn = this;
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Login","Home")",
+                    data: JSON.stringify(user),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        $('#form').removeClass('animated shake');
+                        sendLove2(btn);
+                        if (response === "yes") {
+                            sendLove(btn);
+                            iziToast.success({
+                                title: 'Başarılı',
+                                message: 'Giriş işleminiz gerçekleşmiştir.'
+                            });
+                            window.setTimeout(function () { window.location.href = "@ViewBag.ReturnUrl"}, 1000);
+                        } else if (response === "Şifreniz yanlıştır.") {
+                            sendLove2(btn);
+                            iziToast.warning({
+                                title: 'Dikkat!',
+                                message: 'Şifreniz yanlıştır.'
+                            });
+                            $('#form').addClass('animated shake');
+                        }
+                        else if (response === "Kullanıcı adınız yanlıştır.") {
+                            sendLove2(btn);
+                            iziToast.warning({
+                                title: 'Dikkat!',
+                                message: 'Giriş bilgileriniz hatalıdır.'
+                            });
+                            $('#form').addClass('animated shake');
+                        } else {
+                            sendLove2(btn);
+                            iziToast.warning({
+                                title: 'Dikkat!',
+                                message: 'Giriş bilgileriniz hatalıdır.'
+                            });
+                            $('#form').addClass('animated shake');
+                        }
+                    },
+                    failure: function(response) {
+                        alert(response.responseText);
+                    },
+                    error: function(response) {
+                        alert(response.responseText);
+                    }
+                });
+            }
+        });
+
+    </script>
+}

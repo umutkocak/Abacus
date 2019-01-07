@@ -1,0 +1,382 @@
+﻿@{
+    ViewBag.Title = "Öğrenciler - ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row" ng-app="">
+    <div class="col-md-12">
+
+        <div class="card">
+            <div class="card-header header-elements-inline">
+                <h5 class="card-title">Öğrenciler</h5>
+            </div>
+          
+                <div class="card-body">
+                    <p><button id="add" type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"><i class="icon-comment-discussion mr-2"></i>Yeni Öğrenci Ekle</button></p>
+                </div>
+                <!-- Vertical form modal -->
+                <div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="true" style="z-index: 1050; display: none;" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Yeni Öğrenci Ekle</h5>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <form id="form">
+                                <div class="modal-body">
+
+                                    <input type="text" id="ID" hidden="" class="form-control">
+
+                                    <div class="form-group">
+                                        <label>Öğrenci resmini seçin:</label>
+                                        <input type="file" id="Picture" />
+                                        <input type="text" hidden id="pictures" class="form-control">
+
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>TC Kimlik Numarası</label>
+                                        <input type="text" id="TCNumber" minlength="11" maxlength="11" class="form-control maxlength" placeholder="TC Kimlik Numarası">
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-md-6">
+                                            <label>Adı & Soyadı</label>
+                                            <input type="text" id="FullName" class="form-control" placeholder="Adı & Soyadı">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Öğrenci Numarası</label>
+                                            <input type="text" id="StudentNumber" class="form-control" placeholder="Öğrenci Kimliği">
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-6">
+                                            <label>Sınıfı Seç</label>
+                                            <select id="ClassId" class="form-control select-fixed-single"></select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Doğum Tarihi</label>
+                                            <input type="date" id="Birthday" class="form-control" placeholder="Doğum Tarihi">
+                                        </div>
+                                    </div>
+
+
+
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                                    <button type="submit" class="btn btn-primary">Kaydet <i class="icon-database-check ml-2"></i></button>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- /vertical form modal -->
+       
+
+
+            <table id="examples" class="table" style="width: 100%"></table>
+
+
+
+        </div>
+
+
+
+    </div>
+
+</div>
+
+@section scripts{
+
+    <script src="~/Content/assets/js/plugins/forms/inputs/maxlength.min.js"></script>
+
+
+    <script>
+
+        $(document).ready(function () {
+
+            $.select2Ajax.VeriCek("#ClassId", "/json/select2/class");
+
+
+            $('.maxlength').maxlength({
+                alwaysShow: true
+            });
+
+            function formatDate(inputDate) {
+                var value = new Date(parseInt(inputDate.replace(/(^.*\()|([+-].*$)/g, '')));
+                var formattedDate = value.getDate() + "." + value.getMonth() + "." + value.getFullYear();
+                return formattedDate;
+            }
+
+            $('#examples').DataTable({
+                "ajax": {
+                    "url": "/json/students",
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "width": "2%", "title": "#ID", "data": "Student.ID" },
+                    {
+                        "title": "Resim",
+                        "data": "Student.Picture",
+                        "width": "10%",
+                        "searchable": true,
+                        "sortable": true,
+                        "processing": true,
+                        "serverSide": true,
+                        "defaultContent":
+                            '<img src="/Content/assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="40" height="40" alt="">',
+                        "render": function (data, type, full, meta) {
+                            return (full.Picture !== null)
+                                ? '<img src="/Uploads/' +
+                                full.Picture +
+                                '" class="rounded-circle" width="40" height="40" alt="">'
+                                : "Resim Yok";
+                        }
+                    },
+                    { "title": "Adı Soyadı", "data": "Student.FullName", "autoWidth": true },
+                    {
+                        "title": "Doğum Tarihi",
+                        "data": "Student.Birthday",
+                        "width": "20%",
+                        "render": function (data, type, full, meta) {
+                            return new Date(parseInt(data.substr(6))).format("dd/mm/yyyy");
+                        }
+                    },
+                    { "title": "Sınıfı", "data": "Class", "autoWidth": true },
+                    {
+                        "title": "Seçenekler",
+                        "data": "Student.ID",
+                        "width": "5%",
+                        "searchable": true,
+                        "sortable": true,
+                        "processing": true,
+                        "serverSide": true,
+                        "render": function (data, type, full, meta) {
+                            return '<div class="list-icons">' +
+                                '										<div class="dropdown">' +
+                                '											<a class="list-icons-item" data-toggle="dropdown" aria-expanded="false">' +
+                                '												<i class="icon-menu9"></i>' +
+                                '											</a>' +
+                                '' +
+                                '											<div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-158px, 19px, 0px); top: 0px; left: 0px; will-change: transform;">' +
+                                '												<a data-id=' +
+                                data +
+                                ' class="update-link dropdown-item"><i class="icon-pen6"></i> Düzenle</a>' +
+                                '												<a data-id=' +
+                                data +
+                                ' class="delete-link dropdown-item"><i class="icon-trash"></i> Sil</a>' +
+                                '											</div>' +
+                                '										</div>' +
+                                '									</div>';
+                        }
+                    }
+                ],
+                autoWidth: false,
+                dom:
+                    '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
+                "order":
+                    [[0, "desc"]],
+                "language":
+                {
+                    "url":
+                        "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json"
+                }
+            });
+
+
+            $("#add").click(function (e) {
+                $("#form")[0].reset();
+                $("#ClassId").val(null).trigger('change');
+                $(".modal-title").html("Yeni Öğrenci Ekle");
+            });
+
+            $("form").submit(function (e) {
+                e.preventDefault();
+
+                $.imageUpload.Post("#Picture");
+
+                var isValidate = false;
+
+                function formKontrol() {
+
+                    if ($('#TCNumber').val().length <= 0) {
+                        $("#TCNumber").attr("placeholder", "Zorunlu Alan (*)").focus();
+                        isValidate = false;
+                    } else if ($('#FullName').val().length <= 0) {
+                        $("#FullName").attr("placeholder", "Zorunlu Alan (*)").focus();
+                        isValidate = false;
+                    } else if ($('#StudentNumber').val().length <= 0) {
+                        $("#StudentNumber").attr("placeholder", "Zorunlu Alan (*)").focus();
+                        isValidate = false;
+                    } else if ($('#Birthday').val().length <= 0) {
+                        $("#Birthday").attr("placeholder", "Zorunlu Alan (*)").focus();
+                        isValidate = false;
+                    } else
+                        isValidate = true;
+                };
+
+
+                formKontrol();
+                if (isValidate === true) {
+                    var student = new Object();
+                    var filename = "";
+                    if ($("#Picture").val().length > 0) {
+
+                        var fileInput = document.getElementById('Picture');
+                        filename = fileInput.files[0].name;
+                    } else {
+                        filename = $("#pictures").val();
+                    }
+                    
+                    if ($('#ID').val().length >= 1) {
+                        student.ID = $('#ID').val();
+                    }
+                    student.TCNumber = $('#TCNumber').val();
+                    student.FullName = $('#FullName').val();
+                    student.Birthday = $("#Birthday").val();
+                    student.StudentNumber = $("#StudentNumber").val();
+                    student.Picture = filename;
+                    var classStudent = new Object();
+                    classStudent.ClassId = $("#ClassId").val();
+                    $.ajax({
+                        type: "POST",
+                        url: "/students/add",
+                        data: JSON.stringify({ std: student, clsStd: classStudent }),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (response) {
+                            if (response === "Success") {
+                                iziToast.success({
+                                    title: 'Başarılı',
+                                    message: 'Kayıt işleminiz gerçekleştirilmiştir.'
+                                });
+                                $("#examples").DataTable().ajax.reload();
+                                $("#myModal").modal('hide');
+                            } else if (response === "Update") {
+                                iziToast.success({
+                                    title: 'Başarılı',
+                                    message: 'Değişiklikler kaydedilmiştir.'
+                                });
+                                $("#examples").DataTable().ajax.reload();
+                                $("#myModal").modal('hide');
+                            } else if (response === "Saved") {
+                                iziToast.info({
+                                    title: 'Bilgi',
+                                    message: 'Bu öğrenci daha önce sisteme kaydedilmiştir.'
+                                });
+                            } else {
+                                iziToast.warning({
+                                    title: 'Hata',
+                                    message: 'Lütfen tekrar deneyiniz.'
+                                });
+                                alert(response);
+                            }
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                }
+
+
+            });
+
+
+            $('#examples tbody').on('click',
+                'a.delete-link',
+                function () {
+                    var id = $(this).attr("data-id");
+                    iziToast.question({
+                        timeout: 20000,
+                        close: false,
+                        overlay: true,
+                        displayMode: 'once',
+                        id: 'question',
+                        zindex: 999,
+                        title: 'Dikkat',
+                        message: 'Silmek istediğinize emin misiniz?',
+                        position: 'center',
+                        buttons: [
+                            [
+                                '<button><b>Evet</b></button>', function (instance, toast) {
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '/students/delete/' + id,
+                                        success: function (response) {
+                                            if (response === "Success") {
+                                                iziToast.success({
+                                                    title: 'Başarılı',
+                                                    message: 'Silme işleminiz gerçekleşmiştir.'
+                                                });
+                                                $("#examples").DataTable().ajax.reload();
+                                            } else {
+                                                iziToast.warning({
+                                                    title: 'Hata',
+                                                    message: 'Lütfen tekrar deneyiniz.'
+                                                });
+                                            }
+                                        }
+                                    });
+                                    instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                                }, true
+                            ],
+                            [
+                                '<button>Hayır</button>', function (instance, toast) {
+
+                                    instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                                }
+                            ],
+                        ]
+                    });
+
+                });
+
+            $('#examples tbody').on('click',
+                'a.update-link',
+                function () {
+                    var id = $(this).attr("data-id");
+                    $.ajax({
+                        url: '/students/details/' + id,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            $(".modal-title").html("Güncelle");
+                            $("#ClassId").val(null).trigger('change');
+                            $("#ID").val(data.data[0].Student.ID);
+                            $("#TCNumber").val(data.data[0].Student.TCNumber);
+                            $("#FullName").val(data.data[0].Student.FullName);
+                            $('#pictures').val(data.data[0].Student.Image);
+                            $("#StudentNumber").val(data.data[0].Student.StudentNumber);
+                            var date = new Date(parseInt(data.data[0].Student.Birthday.substr(6))).toISOString().split('T')[0];
+                            $("#Birthday").val(date);
+                            if (data.data[0].Class != null) {
+                                $("#ClassId").select2("trigger",
+                                    "select",
+                                    { data: { text: data.data[0].Class, id: data.data[0].ClassId } });
+                            }
+                            $("#myModal").modal('show');
+
+
+                        },
+                        error: function (err) {
+                            alert("Error: " + err.responseText);
+                        }
+                    });
+
+
+                });
+
+        });
+    </script>
+
+}

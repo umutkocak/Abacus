@@ -1,0 +1,428 @@
+﻿
+@{
+    ViewBag.Title = "Kullanıcılar - ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row" ng-app="">
+    <div class="col-md-12">
+
+        <div class="card">
+            <div class="card-header header-elements-inline">
+                <h5 class="card-title">Kullanıcılar</h5>
+            </div>
+
+            <div class="card-body">
+                <p><button id="add" type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"><i class="icon-comment-discussion mr-2"></i>Yeni Kullanıcı Ekle</button></p>
+            </div>
+
+            <!-- Vertical form modal -->
+            <div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="true" style="z-index: 1050; display: none;" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Yeni Kullanıcı</h5>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <form id="form">
+                            <div class="modal-body">
+
+                                <input type="text" id="ID" hidden="" class="form-control">
+
+                                <div class="form-group">
+                                    <label>Kullanıcı Adı</label>
+                                    <input type="text" id="username" class="form-control" placeholder="Kullanıcı Adı">
+                                </div>
+                                <div class="form-group">
+                                    <label>Email Adresi</label>
+                                    <input type="email" id="email" class="form-control" placeholder="Email Adresi">
+                                </div>
+                                <div class="form-group">
+                                    <label>Şifre:</label>
+                                    <input type="password" id="password" class="form-control" placeholder="Şifre">
+                                </div>
+
+                                <div class="form-group pt-2">
+                                    <div class="form-check form-check-switch form-check-switch-left">
+                                        <label id="schk" class="form-check-label">
+                                            <input type="checkbox" data-toggle="toggle" id="stdChk" data-on="Evet" data-off="Hayır">
+                                            Öğrenci mi?
+                                        </label>
+                                    </div>
+                                    <div id="isStudent" class="form-group">
+                                        <label class="d-block">Öğrenciyi Seç</label>
+                                        <select id="StudentId" class="select-fixed-single form-control"></select>
+                                    </div>
+
+                                    <div class="form-check form-check-switch form-check-switch-left">
+                                        <label id="tchk" class="form-check-label">
+                                            <input type="checkbox" data-toggle="toggle" id="tchChk" data-on="Evet" data-off="Hayır">
+                                            Öğretmen mi?
+                                        </label>
+                                    </div>
+
+                                    <div id="isTeacher" class="form-group">
+                                        <label class="d-block">Öğretmeni Seç</label>
+                                        <select id="TeacherId" class="form-control select-fixed-single"></select>
+                                    </div>
+
+                                </div>
+
+
+
+
+
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                                <button type="submit" class="btn btn-primary">Kaydet <i class="icon-database-check ml-2"></i></button>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- /vertical form modal -->
+
+            <table id="examples" class="table" style="width: 100%"></table>
+
+
+
+        </div>
+    </div>
+</div>
+
+
+
+
+@section scripts{
+
+    <link href="~/Content/assets/css/bootstrap-toggle.min.css" rel="stylesheet" />
+    <script src="~/Content/assets/js/bootstrap-toggle.min.js"></script>
+    <script>
+
+
+        $(document).ready(function () {
+            $("#isStudent").hide();
+            $("#isTeacher").hide();
+
+            $(function () {
+                $('#stdChk').bootstrapToggle();
+                $('#tchChk').bootstrapToggle();
+            });
+
+            function formatDate(inputDate) {
+                var value = new Date(parseInt(inputDate.replace(/(^.*\()|([+-].*$)/g, '')));
+                var formattedDate = value.getDate() + "." + value.getMonth() + "." + value.getFullYear();
+                return formattedDate;
+            }
+
+            $('#examples').DataTable({
+                "ajax": {
+                    "url": "/json/users",
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "width": "2%", "title": "#ID", "data": "ID" },
+                    {
+                        "title": "Resim",
+                        "data": "StudentImage",
+                        "width": "10%",
+                        "searchable": true,
+                        "sortable": true,
+                        "processing": true,
+                        "serverSide": true,
+                        "defaultContent":
+                            '<img src="/Content/assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="40" height="40" alt="">',
+                        "render": function (data, type, full, meta) {
+                            return (full.StudentImage !== null)
+                                ? getImage(full.StudentImage)
+                                : getImage(full.TeacherImage);
+                        }
+                    },
+                    {
+                        "title": "Hesap",
+                        "data": "Student",
+                        "searchable": true,
+                        "sortable": true,
+                        "processing": true,
+                        "serverSide": true,
+                        "defaultContent": "Diğer",
+                        "render": function (data, type, full, meta) {
+                            return (full.Student !== null) ? full.Student : full.Teacher;
+                        }
+                    },
+                    { "title": "Kullanıcı Adı", "data": "Username", "autoWidth": true },
+                    {
+                        "title": "Oluşturulma Tarihi",
+                        "data": "CreatedDate",
+                        "autoWidth": true,
+                        "render": function (data) {
+                            return (data === null) ? "Veri Yok" : new Date(parseInt(data.substr(6))).format("dd/mm/yyyy");
+                        }
+                    },
+                    {
+                        "title": "Seçenekler",
+                        "data": "ID",
+                        "width": "5%",
+                        "searchable": true,
+                        "sortable": true,
+                        "processing": true,
+                        "serverSide": true,
+                        "render": function (data, type, full, meta) {
+                            return '<div class="list-icons">' +
+                                '										<div class="dropdown">' +
+                                '											<a href="#" class="list-icons-item" data-toggle="dropdown" aria-expanded="false">' +
+                                '												<i class="icon-menu9"></i>' +
+                                '											</a>' +
+                                '' +
+                                '											<div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-158px, 19px, 0px); top: 0px; left: 0px; will-change: transform;">' +
+                                '												<a href="#" data-id=' +
+                                data +
+                                ' class="update-link dropdown-item"><i class="icon-pen6"></i> Düzenle</a>' +
+                                '												<a href="#" data-id=' +
+                                data +
+                                ' class="delete-link dropdown-item"><i class="icon-trash"></i> Sil</a>' +
+                                '											</div>' +
+                                '										</div>' +
+                                '									</div>';
+                        }
+                    }
+                ],
+                autoWidth: false,
+                dom:
+                    '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
+                "order":
+                    [[0, "desc"]],
+                "language":
+                {
+                    "url":
+                        "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json"
+                }
+            });
+
+            function getImage(data) {
+
+                var image = "";
+                if (data != null) {
+                    image +=
+                        '<img src="/Uploads/' + data + '" class="rounded-circle" width="40" height="40" alt="">';
+
+                } else {
+                    image +=
+                        '<img src="/Content/assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="40" height="40" alt="">';
+                }
+
+                return image;
+
+            };
+
+
+            $.select2Ajax.VeriCek("#StudentId", "/json/select2/students");
+            $.select2Ajax.VeriCek("#TeacherId", "/json/select2/teachers");
+
+            function formClear() {
+                $("#form")[0].reset();
+                $("#StudentId").val('').trigger('change');
+                $("#TeacherId").val('').trigger('change');
+                $('#stdChk').prop('checked', false).change();
+                $('#tchChk').prop('checked', false).change();
+            };
+
+            $("#add").click(function (e) {
+                formClear();
+            });
+
+            $('#stdChk').change(function () {
+                if (this.checked) {
+                    $("#tchChk").prop("disabled", true);
+                    $('#isStudent').show();
+                } else {
+                    $("#tchChk").prop("disabled", false);
+                    $('#isStudent').hide();
+                }
+            });
+
+
+            $('#tchChk').change(function () {
+                if (this.checked) {
+                    $("#stdChk").prop("disabled", true);
+                    $("#isTeacher").show();
+                } else {
+                    $("#stdChk").prop("disabled", false);
+                    $('#isTeacher').hide();
+                }
+            });
+
+            var isValidate = false;
+            function formKontrol() {
+
+                if ($('#username').val().length <= 0) {
+                    $("#username").attr("placeholder", "Zorunlu Alan (*)").focus();
+                    isValidate = false;
+                } else if ($('#password').val().length <= 0) {
+                    $("#password").attr("placeholder", "Zorunlu Alan (*)").focus();
+                    isValidate = false;
+                } else if ($('#email').val().length <= 0) {
+                    $("#email").attr("placeholder", "Zorunlu Alan (*)").focus();
+                    isValidate = false;
+                } else
+                    isValidate = true;
+            };
+
+            $("form").submit(function (e) {
+                e.preventDefault();
+
+                formKontrol();
+                if (isValidate === true) {
+                    var user = new Object();
+
+                    if ($('#ID').val().length >= 1) {
+                        user.ID = $('#ID').val();
+                    }
+                    user.Username = $('#username').val();
+                    user.Password = $('#password').val();
+                    user.Email = $("#email").val();
+                    user.StudentId = $('#StudentId').val();
+                    user.TeacherId = $('#TeacherId').val();
+                    $.ajax({
+                        type: "POST",
+                        url: "/register",
+                        data: JSON.stringify(user),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (response) {
+                            if (response === "Success") {
+                                iziToast.success({
+                                    title: 'Başarılı',
+                                    message: 'Kayıt işleminiz gerçekleşmiştir.'
+                                });
+                                $("#examples").DataTable().ajax.reload();
+                                $("#myModal").modal('hide');
+                            } else if (response === "Update") {
+                                iziToast.success({
+                                    title: 'Başarılı',
+                                    message: $('#username').val() + " kullanıcısı başarıyla güncellenmiştir"
+                                });
+                                $("#examples").DataTable().ajax.reload();
+                                $("#myModal").modal('hide');
+                            } else if (response === "Mail Kayıtlı") {
+                                iziToast.info({
+                                    title: 'Dikkat',
+                                    message: 'Girilen mail adresi daha önce sisteme kaydedilmiştir.'
+                                });
+                            } else {
+                                iziToast.warning({
+                                    title: 'Hata',
+                                    message: 'Lütfen tekrar deneyiniz.'
+                                });
+                                alert(response);
+                            }
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                }
+            });
+
+
+            $('#examples tbody').on('click',
+                'a.delete-link',
+                function () {
+                    var id = $(this).attr("data-id");
+                    iziToast.question({
+                        timeout: 20000,
+                        close: false,
+                        overlay: true,
+                        displayMode: 'once',
+                        id: 'question',
+                        zindex: 999,
+                        title: 'Dikkat',
+                        message: 'Silmek istediğinize emin misiniz?',
+                        position: 'center',
+                        buttons: [
+                            [
+                                '<button><b>Evet</b></button>', function (instance, toast) {
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '/users/delete/' + id,
+                                        success: function (response) {
+                                            if (response === "Success") {
+                                                iziToast.success({
+                                                    title: 'Başarılı',
+                                                    message: 'Kayıt işleminiz gerçekleşmiştir.'
+                                                });
+                                                $("#examples").DataTable().ajax.reload();
+                                            } else {
+                                                iziToast.warning({
+                                                    title: 'Hata',
+                                                    message: 'Lütfen tekrar deneyiniz.'
+                                                });
+                                            }
+                                        }
+                                    });
+                                    instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                                }, true
+                            ],
+                            [
+                                '<button>Hayır</button>', function (instance, toast) {
+
+                                    instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                                }
+                            ],
+                        ]
+                    });
+
+                });
+
+            $('#examples tbody').on('click',
+                'a.update-link',
+                function () {
+                    var id = $(this).attr("data-id");
+                    $.ajax({
+                        url: '/users/details/' + id,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            formClear();
+                            $(".modal-title").html("Güncelle");
+                            $("#ID").val(data[0].ID);
+                            $("#username").val(data[0].Username);
+                            $("#password").val(data[0].Password).attr("disabled", "disabled");
+                            $("#email").val(data[0].Email);
+                            if (data[0].StudentId != null) {
+                                $('#stdChk').prop('checked', true).change();
+                                $("#StudentId").select2("trigger",
+                                    "select",
+                                    { data: { text: data[0].Student, id: data[0].StudentId } });
+                            }
+                            if (data[0].TeacherId != null) {
+                                $('#tchChk').prop('checked', true).change();
+                                $("#TeacherId").select2("trigger",
+                                    "select",
+                                    { data: { text: data[0].Teacher, id: data[0].TeacherId } });
+                            }
+                            $("#myModal").modal('show');
+
+
+                        },
+                        error: function (err) {
+                            alert("Error: " + err.responseText);
+                        }
+                    });
+
+
+                });
+
+        });
+
+    </script>
+}

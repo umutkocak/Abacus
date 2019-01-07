@@ -1,0 +1,480 @@
+﻿@using OBS.Models
+@{
+    ViewBag.Title = "Dersler - ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600" rel="stylesheet">
+<link rel="stylesheet" href="~/Content/assets/schedule/css/reset.css">
+
+<div class="card">
+    <div class="card-header">
+        Haftalık Ders Programı
+    </div>
+
+    @if (Session["roleName"].ToString() == "Admin")
+    {
+        <div class="card-body">
+            <p><button id="add" type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"><i class="icon-plus-circle2 mr-2"></i>Ders Programı Ekle</button></p>
+
+
+            <hr />
+            <div class="form-group row">
+                <div class="col-md-4">
+                    <label>Sınıfı Seç</label>
+                    <select id="ClassIdList" class="form-control select-fixed-single"></select>
+                </div>
+            </div>
+
+        </div>
+        <!-- Vertical form modal -->
+        <div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="true" style="z-index: 1050; display: none;" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Yeni Ders Programı Ekle</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <form id="form">
+                        <div class="modal-body">
+                            <input type="text" id="ID" hidden="" class="form-control">
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <label>Sınıfı Seç</label>
+                                    <select id="ClassId" class="form-control select-fixed-single"></select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Dersi Seç</label>
+                                    <select id="LessonId" class="form-control select-fixed-single" disabled="disabled"></select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-4">
+                                    <label>Başlangıç Saati</label>
+                                    <select class="js-example-basic-single form-control" id="Day">
+                                        <option value="null">Seçiniz</option>
+                                        <option value="Pazartesi">Pazartesi</option>
+                                        <option value="Salı">Salı</option>
+                                        <option value="Çarşamba">Çarşamba</option>
+                                        <option value="Perşembe">Perşembe</option>
+                                        <option value="Cuma">Cuma</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Başlangıç Saati</label>
+                                    <input type="text" id="StartTime" class="form-control" placeholder="Başlangıç Saati">
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Bitiş Saati</label>
+                                    <input type="text" id="EndTime" class="form-control" placeholder="Bitiş Saati">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label>Rengi Seçin </label>
+                                    <select class="js-example-basic-single form-control" id="Color">
+                                        <option value="null">Seçiniz</option>
+                                        <option value="event-1">Gri</option>
+                                        <option value="event-2">Açık Mavi</option>
+                                        <option value="event-3">Sarı</option>
+                                        <option value="event-4">Kırmızı</option>
+                                        <option value="event-5">Mor</option>
+                                        <option value="event-6">Turuncu</option>
+                                        <option value="event-7">Lacivert</option>
+                                        <option value="event-8">Açık Sarı</option>
+                                        <option value="event-9">Yeşil</option>
+                                        <option value="event-10">Koyu Yeşil</option>
+                                        <option value="event-11">Pembe</option>
+                                        <option value="event-12">Kahverengi</option>
+                                    </select>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="delete-link btn btn-warning mr-auto"><i class="icon-database-remove"></i> &nbsp; Sil </button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                            <button type="submit" class="btn btn-primary">Kaydet <i class="icon-database-check ml-2"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- /vertical form modal -->
+    }
+
+    @if (Session["roleName"].ToString() == "Student" || Session["roleName"].ToString() == "Teacher")
+    {
+        <div class="cd-schedule loading">
+
+            <div class="events">
+                <ul>
+                    <li class="events-group">
+                        <div class="top-info"><span>Pazartesi</span></div>
+                        <ul id="pazartesi"></ul>
+                    </li>
+                    <li class="events-group">
+                        <div class="top-info"><span>Salı</span></div>
+                        <ul id="sali"></ul>
+                    </li>
+                    <li class="events-group">
+                        <div class="top-info"><span>Çarşamba</span></div>
+                        <ul id="carsamba"></ul>
+                    </li>
+                    <li class="events-group">
+                        <div class="top-info"><span>Perşembe</span></div>
+                        <ul id="persembe"></ul>
+                    </li>
+                    <li class="events-group">
+                        <div class="top-info"><span>Cuma</span></div>
+                        <ul id="cuma"></ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="event-modal">
+                <header class="header">
+                    <div class="content">
+                        <span class="event-date"></span>
+                        <h3 class="event-name"></h3>
+                    </div>
+                    <div class="header-bg"></div>
+                </header>
+                <div class="body">
+                    <div class="event-info"></div>
+                    <div class="body-bg"></div>
+                </div>
+                <a href="#0" class="close">Close</a>
+            </div>
+            <div class="cover-layer"></div>
+        </div>
+    }
+    else
+    {
+        <div id="load" class="cd-schedule loading">
+
+            <div class="events">
+                <ul>
+                    <li class="events-group">
+                        <div class="top-info"><span>Pazartesi</span></div>
+                        <ul class="edit" id="pazartesiAdmin"></ul>
+                    </li>
+                    <li class="events-group">
+                        <div class="top-info"><span>Salı</span></div>
+                        <ul class="edit" id="saliAdmin"></ul>
+                    </li>
+                    <li class="events-group">
+                        <div class="top-info"><span>Çarşamba</span></div>
+                        <ul class="edit" id="carsambaAdmin"></ul>
+                    </li>
+                    <li class="events-group">
+                        <div class="top-info"><span>Perşembe</span></div>
+                        <ul class="edit" id="persembeAdmin"></ul>
+                    </li>
+                    <li class="events-group">
+                        <div class="top-info"><span>Cuma</span></div>
+                        <ul class="edit" id="cumaAdmin"></ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="event-modal">
+                <header class="header">
+                    <div class="content">
+                        <span class="event-date"></span>
+                        <h3 class="event-name"></h3>
+                    </div>
+                    <div class="header-bg"></div>
+                </header>
+                <div class="body">
+                    <div class="event-info"></div>
+                    <div class="body-bg"></div>
+                </div>
+                <a href="#0" class="close">Close</a>
+            </div>
+            <div class="cover-layer"></div>
+        </div>
+        <table id="examples" class="table" style="width: 100%"></table>
+    }
+</div>
+
+
+@section scripts{
+    <script>
+        $(document).ready(function() {
+
+            $.getJSON('/json/schedule/' + @Session["userId"], function(json) {
+                $.each(json, function (i, value) {
+                    for (var j = 0; j < value.length; j++) {
+                        if (value[j].Schedule.Day === "Pazartesi") {
+                            var pazartesi =
+                                '<li class="single-event" data-start="' + value[j].Schedule.StartTime + '" data-end="' + value[j].Schedule.EndTime + '" data-content="event-restorative-yoga" data-event="' + value[j].Schedule.Color + '"> <a href="#0"> <span class="event-date">' + value[j].Schedule.StartTime + ' - ' + value[j].Schedule.EndTime+'</span> <em class="event-name">' + value[j].Schedule.Lesson+'</em> </a></li>';
+                            $("#pazartesi").append(pazartesi);
+                        } else if (value[j].Schedule.Day === "Salı") {
+                            var sali =
+                                '<li class="single-event" data-start="' + value[j].Schedule.StartTime + '" data-end="' + value[j].Schedule.EndTime + '" data-content="event-restorative-yoga" data-event="' + value[j].Schedule.Color + '"> <a href="#0"> <span class="event-date">' + value[j].Schedule.StartTime + ' - ' + value[j].Schedule.EndTime + '</span> <em class="event-name">' + value[j].Schedule.Lesson + '</em> </a></li>';
+                            $("#sali").append(sali);
+                        }else if (value[j].Schedule.Day === "Çarşamba") {
+                            var carsamba =
+                                '<li class="single-event" data-start="' + value[j].Schedule.StartTime + '" data-end="' + value[j].Schedule.EndTime + '" data-content="event-restorative-yoga" data-event="' + value[j].Schedule.Color + '"> <a href="#0"> <span class="event-date">' + value[j].Schedule.StartTime + ' - ' + value[j].Schedule.EndTime + '</span> <em class="event-name">' + value[j].Schedule.Lesson + '</em> </a></li>';
+                            $("#carsamba").append(carsamba);
+                        } else if (value[j].Schedule.Day === "Perşembe") {
+                            var persembe =
+                                '<li class="single-event" data-start="' + value[j].Schedule.StartTime + '" data-end="' + value[j].Schedule.EndTime + '" data-content="event-restorative-yoga" data-event="' + value[j].Schedule.Color + '"> <a href="#0"> <span class="event-date">' + value[j].Schedule.StartTime + ' - ' + value[j].Schedule.EndTime + '</span> <em class="event-name">' + value[j].Schedule.Lesson + '</em> </a></li>';
+                            $("#persembe").append(persembe);
+                        } else if (value[j].Schedule.Day === "Cuma") {
+                            var cuma =
+                                '<li class="single-event" data-start="' + value[j].Schedule.StartTime + '" data-end="' + value[j].Schedule.EndTime + '" data-content="event-restorative-yoga" data-event="' + value[j].Schedule.Color + '"> <a href="#0"> <span class="event-date">' + value[j].Schedule.StartTime + ' - ' + value[j].Schedule.EndTime + '</span> <em class="event-name">' + value[j].Schedule.Lesson + '</em> </a></li>';
+                            $("#cuma").append(cuma);
+                        }
+                    }
+                });
+            });
+
+
+
+
+
+        });
+    </script>
+
+    @if (Session["roleName"].ToString() == "Admin")
+    {
+        <script type="text/javascript">
+            $(document).ready(function () {
+
+                $('#Color').select2({
+                    placeholder: "Rengi Seçin"
+                });
+                $('#Day').select2({
+                    placeholder: "Günü Seçin"
+                });
+
+                $.select2Ajax.VeriCek("#ClassId", "/json/select2/class");
+
+                $('#ClassId').change('select2:selecting',
+                    function (e) {
+                        $("#LessonId").attr("disabled", false);
+                        $.select2Ajax.VeriCek("#LessonId", "/json/select2/class/" + $("#ClassId option:selected").val());
+                    });
+
+                $.select2Ajax.VeriCek("#ClassIdList", "/json/select2/class");
+
+                $('#ClassIdList').change('select2:selecting',
+                    function (e) {
+                        getSchedule();
+                    });
+
+
+                function getSchedule() {
+
+                    $('body').loading({
+                        stoppable: true,
+                        message: 'Ders programınız yükleniyor...'
+                    });
+                    $("#pazartesiAdmin").empty();
+                    $("#saliAdmin").empty();
+                    $("#carsambaAdmin").empty();
+                    $("#persembeAdmin").empty();
+                    $("#cumaAdmin").empty();
+                    var pazartes = [];
+                    $.getJSON('/json/schedule/list/' + $("#ClassIdList").val(), function (json) {
+                        $.each(json, function (i, value) {
+                            for (var j = 0; j < value.length; j++) {
+                                if (value[j].Schedule.Day === "Pazartesi") {
+                                    pazartes.push(
+                                        '<li class="single-event" data-start="' + value[j].Schedule.StartTime + '" data-end="' + value[j].Schedule.EndTime + '" data-content="event-restorative-yoga" data-event="' + value[j].Schedule.Color + '"> <a href="#0" data-id="' + value[j].ID + '" class="update-link"> <span class="event-date">' + value[j].Schedule.StartTime + ' - ' + value[j].Schedule.EndTime + '</span> <em class="event-name">' + value[j].Schedule.Lesson + '</em> </a></li>');   
+                                } else if (value[j].Schedule.Day === "Salı") {
+                                    var sali =
+                                        '<li class="single-event" data-start="' + value[j].Schedule.StartTime + '" data-end="' + value[j].Schedule.EndTime + '" data-content="event-restorative-yoga" data-event="' + value[j].Schedule.Color + '"> <a href="#0" data-id="' + value[j].ID + '" class="update-link"><span class="event-date">' + value[j].Schedule.StartTime + ' - ' + value[j].Schedule.EndTime + '</span> <em class="event-name">' + value[j].Schedule.Lesson + '</em> </a></li>';
+                                    $("#saliAdmin").append(sali);
+                                } else if (value[j].Schedule.Day === "Çarşamba") {
+                                    var carsamba =
+                                        '<li class="single-event" data-start="' + value[j].Schedule.StartTime + '" data-end="' + value[j].Schedule.EndTime + '" data-content="event-restorative-yoga" data-event="' + value[j].Schedule.Color + '"> <a href="#0" data-id="' + value[j].ID + '" class="update-link"> <span class="event-date">' + value[j].Schedule.StartTime + ' - ' + value[j].Schedule.EndTime + '</span> <em class="event-name">' + value[j].Schedule.Lesson + '</em> </a></li>';
+                                    $("#carsambaAdmin").append(carsamba);
+                                } else if (value[j].Schedule.Day === "Perşembe") {
+                                    var persembe =
+                                        '<li class="single-event" data-start="' + value[j].Schedule.StartTime + '" data-end="' + value[j].Schedule.EndTime + '" data-content="event-restorative-yoga" data-event="' + value[j].Schedule.Color + '"> <a href="#0" data-id="' + value[j].ID + '" class="update-link"><span class="event-date">' + value[j].Schedule.StartTime + ' - ' + value[j].Schedule.EndTime + '</span> <em class="event-name">' + value[j].Schedule.Lesson + '</em> </a></li>';
+                                    $("#persembeAdmin").append(persembe);
+                                } else if (value[j].Schedule.Day === "Cuma") {
+                                    var cuma =
+                                        '<li class="single-event" data-start="' + value[j].Schedule.StartTime + '" data-end="' + value[j].Schedule.EndTime + '" data-content="event-restorative-yoga" data-event="' + value[j].Schedule.Color + '">  <a href="#0" data-id="' + value[j].ID + '" class="update-link"><span class="event-date">' + value[j].Schedule.StartTime + ' - ' + value[j].Schedule.EndTime + '</span> <em class="event-name">' + value[j].Schedule.Lesson + '</em> </a></li>';
+                                    $("#cumaAdmin").append(cuma);
+                                }
+                            }
+                        });
+                        document.getElementById('pazartesiAdmin').innerHTML = pazartes.join("");
+                    });
+                    $('body').loading('stop');
+                }
+
+                function clearForm() {
+                    $("#Color").val(null).trigger('change');
+                    $("#Day").val(null).trigger('change');
+                    $("#ClassId").val(null).trigger('change');
+                    $("#LessonId").val(null).trigger('change');
+                    $("#form")[0].reset();
+                    $(".modal-title").html("Yeni Ekle");
+                }
+
+                $("#add").click(function (e) {
+                    clearForm();
+                    $("#ClassId").val(null).trigger('change');
+                    $("#LessonId").val(null).trigger('change');
+                    $(".delete-link").hide();
+                });
+
+                var isValidate = false;
+
+                function formKontrol() {
+
+                    if ($('#ClassId').val() === null) {
+                        $("#ClassId").select2('open');
+                        isValidate = false;
+                    } else if ($('#LessonId').val() == null) {
+                        $("#LessonId").select2('open');
+                        isValidate = false;
+                    } else if ($('#Day').val() === "null") {
+                        $("#Day").select2('open');
+                        isValidate = false;
+                    } else if ($('#StartTime').val().length <= 0) {
+                        $("#StartTime").attr("placeholder", "Zorunlu Alan (*)").focus();
+                        isValidate = false;
+                    } else if ($('#EndTime').val().length <= 0) {
+                        $("#EndTime").attr("placeholder", "Zorunlu Alan (*)").focus();
+                        isValidate = false;
+                    } else if ($('#Color').val() === "null") {
+                        $("#Color").select2('open');
+                        isValidate = false;
+                    } else
+                        isValidate = true;
+                };
+
+                $("form").submit(function (e) {
+                    e.preventDefault();
+
+                    formKontrol();
+                    if (isValidate === true) {
+                        var data = new Object();
+                        if ($('#ID').val().length >= 1) {
+                            data.ID = $('#ID').val();
+                        }
+                        data.ClassId = $('#ClassId').val();
+                        data.LessonId = $('#LessonId').val();
+                        data.Day = $("#Day").val();
+                        data.StartTime = $("#StartTime").val();
+                        data.EndTime = $("#EndTime").val();
+                        data.Color = $("#Color").val();
+                        $.ajax({
+                            type: "POST",
+                            url: "/class/schedule/add",
+                            data: JSON.stringify(data),
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (response) {
+                                if (response === "Success") {
+                                    $.iziToast.Success();
+                                    getSchedule();
+                                    $("#myModal").modal('hide');
+                                } else if (response === "Update") {
+                                    $.iziToast.Success();
+                                    getSchedule();
+                                    $("#myModal").modal('hide');
+                                } else if (response === "Saved") {
+                                    $.iziToast.Info("Bu ders için aynı gün maksimum 3 program girebilirsiniz.");;
+                                } else {
+                                    $.iziToast.Warning();
+                                    alert(response);
+                                }
+                            },
+                            failure: function (response) {
+                                alert(response.responseText);
+                            },
+                            error: function (response) {
+                                alert(response.responseText);
+                            }
+                        });
+                    }
+
+                });
+
+                $('#myModal').on('click',
+                    '.delete-link',
+                    function () {
+                        var id = $("#ID").val();
+                        iziToast.question({
+                            timeout: 20000,
+                            close: false,
+                            overlay: true,
+                            displayMode: 'once',
+                            id: 'question',
+                            title: 'Dikkat',
+                            message: 'Silmek istediğinize emin misiniz?',
+                            position: 'center',
+                            buttons: [
+                                ['<button><b>Evet</b></button>', function (instance, toast) {
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '/class/schedule/delete/' + id,
+                                        success: function (response) {
+                                            if (response === "Success") {
+                                                $.iziToast.Success();
+                                                getSchedule();
+                                                $("#myModal").modal('hide');
+                                            } else {
+                                                $.iziToast.Warning();
+                                            }
+                                        }
+                                    });
+                                    instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                                }, true],
+                                ['<button>Hayır</button>', function (instance, toast) {
+
+                                    instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                                }]
+                            ]
+                        });
+
+                    });
+
+
+                $('.edit').on('click', '.update-link', function () {
+                    var id = $(this).attr("data-id");
+                    $.ajax({
+                        url: '/json/class/schedule/details/' + id,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            $(".modal-title").html("Güncelle");
+                            $(".delete-link").show();
+                            $("#ID").val(data.data[0].ID);
+                            $("#Color").val(data.data[0].Schedule.Color).trigger('change');
+                            $("#Day").val(data.data[0].Schedule.Day).trigger('change');
+                            $("#ClassId").select2("trigger",
+                                "select",
+                                { data: { text: data.data[0].Class, id: data.data[0].ClassId } });
+                            $("#LessonId").select2("trigger",
+                                "select",
+                                { data: { text: data.data[0].Schedule.Lesson, id: data.data[0].Schedule.LessonId } });
+                            $("#StartTime").val(data.data[0].Schedule.StartTime);
+                            $("#EndTime").val(data.data[0].Schedule.EndTime);
+                            $("#myModal").modal('show');
+                        },
+                        error: function (err) {
+                            alert("Error: " + err.responseText);
+                        }
+                    });
+                });
+
+            });
+
+
+        </script>
+
+    }
+}
+
+
