@@ -183,7 +183,6 @@
                                 int userId = Convert.ToInt32(Session["userId"]);
                                 var user = _db.Users.FirstOrDefault(x => x.ID == userId);
                                 <span class="badge badge-light badge-striped badge-striped-left border-left-success d-block font-size-base mb-1"> Sınıf: @Session["className"].ToString()</span>
-
                                 if (user != null)
                                 {
                                     var userFind = _db.Students.FirstOrDefault(x => x.ID == user.StudentId);
