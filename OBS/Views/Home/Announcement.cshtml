@@ -5,121 +5,32 @@
 }
 
 
+@if (Session["roleName"].ToString() != "Admin")
+{
+    <!-- Content area -->
+    <div class="d-flex align-items-start flex-column flex-md-row">
 
-<!-- Content area -->
-<div class="d-flex align-items-start flex-column flex-md-row">
+        <!-- Left content -->
+        <div class="tab-content w-100 overflow-auto order-2 order-md-1">
 
-    <!-- Left content -->
-    <div class="tab-content w-100 overflow-auto order-2 order-md-1">
+            <div class="tab-pane fade active show" id="activity">
+                @if (Session["roleName"].ToString() == "Admin" || Session["roleName"].ToString() == "Teacher")
+                {
 
-        <div class="tab-pane fade active show" id="activity">
-            @if (Session["roleName"].ToString() == "Admin" || Session["roleName"].ToString() == "Teacher")
-            {
-
-                <div class="card">
-                    <div class="card-header header-elements-sm-inline">
-                        <button id="add" type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"><i class="icon-plus-circle2"></i> Yeni Duyuru Ekle</button>
-                    </div>
-
-                    <!-- Vertical form modal -->
-                    <div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="true" style="z-index: 1050; display: none;" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Yeni Duyuru Ekle</h5>
-                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                </div>
-                                <form id="form">
-                                    <div class="modal-body">
-                                        <input type="text" id="ID" hidden="" class="form-control">
-                                        <div class="form-group">
-                                            <label>Duyuru Başlığı</label>
-                                            <input type="text" id="title" class="form-control" placeholder="Başlık" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Duyuru İçeriği</label>
-                                            <textarea id="summernote" name="editordata" required></textarea>
-                                        </div>
-                                        <div class="form-group row">
-                                            @if (Session["roleName"].ToString() == "Admin")
-                                            {
-
-                                                <div class="col-md-6">
-                                                    <div class="form-check form-check-switch form-check-switch-left">
-                                                        <label id="schk" class="form-check-label">
-                                                            <input type="checkbox" data-toggle="toggle" id="chkGenel" data-on="Evet" checked="checked" disabled="disabled" data-off="Hayır">
-                                                            Duyuru genel mi olacak?
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            }
-                                            else
-                                            {
-                                                <div class="col-md-6">
-                                                    <div class="form-check form-check-switch form-check-switch-left">
-                                                        <label id="schk" class="form-check-label">
-                                                            <input type="checkbox" data-toggle="toggle" id="chkOgrenci" data-on="Evet" data-off="Hayır">
-                                                            Öğrenciye özel duyuru mu?
-                                                        </label>
-                                                    </div>
-                                                    <div id="ogrenciSelect2">
-                                                        <label>Öğrencinizi Seçin</label>
-                                                        <select id="StudentId" class="form-control select-fixed-single"></select>
-                                                    </div>
-                                                </div>
-                                            }
-
-                                        </div>
-                                        @if (Session["roleName"].ToString() == "Teacher")
-                                        {
-                                            <div id="checkSinif" class="form-group row">
-                                                <div class="col-md-6">
-                                                    <div class="form-check form-check-switch form-check-switch-left">
-                                                        <label id="schk" class="form-check-label">
-                                                            <input type="checkbox" data-toggle="toggle" id="chkSinif" data-on="Evet" data-off="Hayır">
-                                                            Sınıf için mi olacak?
-                                                        </label>
-                                                    </div>
-                                                    <div id="sinifSelect2">
-                                                        <label>Sınıfı Seç</label>
-                                                        <select id="ClassId" class="form-control select-fixed-single"></select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-check form-check-switch form-check-switch-left">
-                                                        <label id="schk" class="form-check-label">
-                                                            <input type="checkbox" data-toggle="toggle" id="chkDers" data-on="Evet" data-off="Hayır">
-                                                            Ders için mi olacak?
-                                                        </label>
-                                                    </div>
-                                                    <div id="dersSelect2">
-                                                        <label>Dersi Seç</label>
-                                                        <select id="LessonId" class="form-control select-fixed-single"></select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        }
-
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
-                                        <button type="submit" class="btn btn-primary">Kaydet <i class="icon-database-check ml-2"></i></button>
-                                    </div>
-                                </form>
-                            </div>
+                    <div class="card">
+                        <div class="card-header header-elements-sm-inline">
+                            <button id="add" type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"><i class="icon-plus-circle2"></i> Yeni Duyuru Ekle</button>
                         </div>
                     </div>
-                    <!-- /vertical form modal -->
-                </div>
-            }
+                }
 
-           
+
 
                 <div class="card">
                     <div class="card-header">
                         @if (Session["roleName"].ToString() == "Student")
                         {
-                        <button id="allDisplay" type="button" class="btn btn-primary"><i class="icon-megaphone"></i> &nbsp; Hepsini Göster</button>
+                            <button id="allDisplay" type="button" class="btn btn-primary"><i class="icon-megaphone"></i> &nbsp; Hepsini Göster</button>
 
                             <button id="allClass" type="button" class="btn btn-success pull-right">Sınıf &nbsp;  <i class="icon-pencil6"></i> </button>
                             <button id="allLesson" type="button" class="btn btn-default bg-indigo">Ders &nbsp;  <i class="icon-books"></i> </button>
@@ -132,93 +43,202 @@
                     </div>
 
                 </div>
-           
 
 
 
-            <!-- Timeline -->
-            <div class="timeline timeline-left">
-                <div class="timeline-container">
-                    <div id="duyurular">
 
+                <!-- Timeline -->
+                <div class="timeline timeline-left">
+                    <div class="timeline-container">
+                        <div id="duyurular">
+
+                        </div>
                     </div>
                 </div>
+                <!-- /timeline -->
+
             </div>
-            <!-- /timeline -->
 
         </div>
+        <!-- /left content -->
+        <!-- Right sidebar component -->
+        <div class="sidebar sidebar-light bg-transparent sidebar-component sidebar-component-right wmin-300 border-0 shadow-0 order-1 order-md-2 sidebar-expand-md">
 
-    </div>
-    <!-- /left content -->
-    <!-- Right sidebar component -->
-    <div class="sidebar sidebar-light bg-transparent sidebar-component sidebar-component-right wmin-300 border-0 shadow-0 order-1 order-md-2 sidebar-expand-md">
+            <!-- Sidebar content -->
+            <div class="sidebar-content">
 
-        <!-- Sidebar content -->
-        <div class="sidebar-content">
+                <!-- User card -->
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div class="card-img-actions d-inline-block mb-3">
+                            <img class="img-fluid rounded-circle" src="~/Uploads/@Session["picture"]" width="170" height="170" alt="">
+                        </div>
 
-            <!-- User card -->
-            <div class="card">
-                <div class="card-body text-center">
-                    <div class="card-img-actions d-inline-block mb-3">
-                        <img class="img-fluid rounded-circle" src="~/Uploads/@Session["picture"]" width="170" height="170" alt="">
-                    </div>
+                        <h6 class="font-weight-semibold mb-0">@Session["userName"]</h6>
 
-                    <h6 class="font-weight-semibold mb-0">@Session["userName"]</h6>
-
-                    <hr />
-                    <span class="d-block text-muted">
-                        @{
-                            OBSEntities _db = new OBSEntities();
-                            if (Session["roleName"].ToString() == "Admin")
-                            {
-                                <span class="badge badge-light badge-striped badge-striped-left border-left-warning-800 d-block font-size-base"> Müdür </span>
-
-                            }
-                            else if (Session["roleName"].ToString() == "Teacher")
-                            {
-                                <span class="badge badge-light badge-striped badge-striped-left border-left-success d-block font-size-base"> Öğretmen </span>
-                            }
-                            else if (Session["roleName"].ToString() == "Student")
-                            {
-                                int userId = Convert.ToInt32(Session["userId"]);
-                                var user = _db.Users.FirstOrDefault(x => x.ID == userId);
-                                <span class="badge badge-light badge-striped badge-striped-left border-left-success d-block font-size-base mb-1"> Sınıf: @Session["className"].ToString()</span>
-                                if (user != null)
+                        <hr />
+                        <span class="d-block text-muted">
+                            @{
+                                OBSEntities _db = new OBSEntities();
+                                if (Session["roleName"].ToString() == "Admin")
                                 {
-                                    var userFind = _db.Students.FirstOrDefault(x => x.ID == user.StudentId);
-                                    if (userFind != null)
+                                    <span class="badge badge-light badge-striped badge-striped-left border-left-warning-800 d-block font-size-base"> Müdür </span>
+
+                                }
+                                else if (Session["roleName"].ToString() == "Teacher")
+                                {
+                                    <span class="badge badge-light badge-striped badge-striped-left border-left-success d-block font-size-base"> Öğretmen </span>
+                                }
+                                else if (Session["roleName"].ToString() == "Student")
+                                {
+                                    int userId = Convert.ToInt32(Session["userId"]);
+                                    var user = _db.Users.FirstOrDefault(x => x.ID == userId);
+                                    <span class="badge badge-light badge-striped badge-striped-left border-left-success d-block font-size-base mb-1"> Sınıf: @Session["className"].ToString()</span>
+                                    if (user != null)
                                     {
-                                        <span class="badge badge-light badge-striped badge-striped-left border-left-success d-block font-size-base mb-1">TC Kimlik Numarası: @userFind.TCNumber</span>
-                                        <span class="badge badge-light badge-striped badge-striped-left border-left-success d-block font-size-base mb-1">Öğrenci Numarası: @userFind.StudentNumber</span>
-                                        <span class="badge badge-light badge-striped badge-striped-left border-left-success d-block font-size-base mb-1">
-                                            Doğum Tarihi: @($"{userFind.Birthday:dd/MM/yyyy}")
-                                        </span>
+                                        var userFind = _db.Students.FirstOrDefault(x => x.ID == user.StudentId);
+                                        if (userFind != null)
+                                        {
+                                            <span class="badge badge-light badge-striped badge-striped-left border-left-success d-block font-size-base mb-1">TC Kimlik Numarası: @userFind.TCNumber</span>
+                                            <span class="badge badge-light badge-striped badge-striped-left border-left-success d-block font-size-base mb-1">Öğrenci Numarası: @userFind.StudentNumber</span>
+                                            <span class="badge badge-light badge-striped badge-striped-left border-left-success d-block font-size-base mb-1">
+                                                Doğum Tarihi: @($"{userFind.Birthday:dd/MM/yyyy}")
+                                            </span>
+                                        }
                                     }
                                 }
                             }
-                        }
-                    </span>
+                        </span>
 
 
+                    </div>
                 </div>
-            </div>
-            <!-- /user card -->
+                <!-- /user card -->
 
+
+            </div>
+            <!-- /sidebar content -->
 
         </div>
-        <!-- /sidebar content -->
+        <!-- /right sidebar component -->
 
     </div>
-    <!-- /right sidebar component -->
 
+    <!-- /content area -->
+}
+else
+{
+    <div class="row" ng-app="">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header header-elements-inline">
+                    <h5 class="card-title">Duyurular</h5>
+                </div>
+                <div class="card-body">
+                    <p><button id="add" type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"><i class="icon-megaphone"></i>Yeni Duyuru Ekle</button></p>
+                </div>
+
+                <table id="examples" class="table" style="width: 100%"></table>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+<!-- Vertical form modal -->
+<div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="true" style="z-index: 1050; display: none;" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Yeni Duyuru Ekle</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <form id="form">
+                <div class="modal-body">
+                    <input type="text" id="ID" hidden="" class="form-control">
+                    <div class="form-group">
+                        <label>Duyuru Başlığı</label>
+                        <input type="text" id="title" class="form-control" placeholder="Başlık" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Duyuru İçeriği</label>
+                        <textarea id="summernote" name="editordata" required></textarea>
+                    </div>
+                    <div class="form-group row">
+                        @if (Session["roleName"].ToString() == "Admin")
+                        {
+
+                            <div class="col-md-6">
+                                <div class="form-check form-check-switch form-check-switch-left">
+                                    <label id="schk" class="form-check-label">
+                                        <input type="checkbox" data-toggle="toggle" id="chkGenel" data-on="Evet" checked="checked" disabled="disabled" data-off="Hayır">
+                                        Duyuru genel mi olacak?
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-6">
+                                <div class="form-check form-check-switch form-check-switch-left">
+                                    <label id="schk" class="form-check-label">
+                                        <input type="checkbox" data-toggle="toggle" id="chkOgrenci" data-on="Evet" data-off="Hayır">
+                                        Öğrenciye özel duyuru mu?
+                                    </label>
+                                </div>
+                                <div id="ogrenciSelect2">
+                                    <label>Öğrencinizi Seçin</label>
+                                    <select id="StudentId" class="form-control select-fixed-single"></select>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                    @if (Session["roleName"].ToString() == "Teacher")
+                    {
+                        <div id="checkSinif" class="form-group row">
+                            <div class="col-md-6">
+                                <div class="form-check form-check-switch form-check-switch-left">
+                                    <label id="schk" class="form-check-label">
+                                        <input type="checkbox" data-toggle="toggle" id="chkSinif" data-on="Evet" data-off="Hayır">
+                                        Sınıf için mi olacak?
+                                    </label>
+                                </div>
+                                <div id="sinifSelect2">
+                                    <label>Sınıfı Seç</label>
+                                    <select id="ClassId" class="form-control select-fixed-single"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-check-switch form-check-switch-left">
+                                    <label id="schk" class="form-check-label">
+                                        <input type="checkbox" data-toggle="toggle" id="chkDers" data-on="Evet" data-off="Hayır">
+                                        Ders için mi olacak?
+                                    </label>
+                                </div>
+                                <div id="dersSelect2">
+                                    <label>Dersi Seç</label>
+                                    <select id="LessonId" class="form-control select-fixed-single"></select>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                    <button type="submit" class="btn btn-primary">Kaydet <i class="icon-database-check ml-2"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
-
-<!-- /content area -->
-
+<!-- /vertical form modal -->
 @section scripts{
 
 
-    <link href="~/Content/assets/css/bootstrap-toggle.min.css" rel="stylesheet" />
+    <link href="~/Content/assets/css/bootstrap-toggle.min.css" rel="stylesheet"/>
     <script src="~/Content/assets/js/bootstrap-toggle.min.js"></script>
 
     <!-- include summernote css/js -->
@@ -227,8 +247,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/lang/summernote-tr-TR.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-
-
+            var role = "@Session["roleName"].ToString()";
+            if (role === "Admin") {
+                function getAnnouncement() { }
+            }
+          
             $('#myModal').on('shown.bs.modal',
                 function() {
                     $('#summernote').summernote({
@@ -248,10 +271,13 @@
 
             function formClear() {
                 $("#form")[0].reset();
+                $('#summernote').summernote('code', '');
                 $('#chkSinif').prop('checked', false).change();
                 $('#chkOgrenci').prop('checked', true).change();
                 $("#ogrenciSelect2").show();
-
+                $("#ClassId").val(null).trigger('change');
+                $("#LessonId").val(null).trigger('change');
+                $("#StudentId").val(null).trigger('change');
                 $("#sinifSelect2").hide();
                 $("#dersSelect2").hide();
 
@@ -261,28 +287,28 @@
                 formClear();
             });
 
-            $("#allDisplay").click(function () {
+            $("#allDisplay").click(function() {
                 $("#announcementStudent").show().addClass('animated fadeInUp');
                 $("#announcementClass").show().addClass('animated fadeInUp');
                 $("#announcementAll").show().addClass('animated fadeInUp');
                 $("#announcementLesson").show().addClass('animated fadeInUp');
             });
 
-            $("#allStudent").click(function () {
+            $("#allStudent").click(function() {
                 $("#announcementStudent").removeClass('animated fadeInUp');
                 $("#announcementStudent").show().addClass('animated fadeInUp');
                 $("#announcementClass").hide();
                 $("#announcementAll").hide();
                 $("#announcementLesson").hide();
             });
-            $("#allLesson").click(function () {
+            $("#allLesson").click(function() {
                 $("#announcementLesson").removeClass('animated fadeInUp');
                 $("#announcementLesson").show().addClass('animated fadeInUp');
                 $("#announcementClass").hide();
                 $("#announcementAll").hide();
                 $("#announcementStudent").hide();
             });
-            $("#allClass").click(function () {
+            $("#allClass").click(function() {
                 $("#announcementClass").removeClass('animated fadeInUp');
                 $("#announcementClass").show().addClass('animated fadeInUp');
                 $("#announcementLesson").hide();
@@ -347,7 +373,7 @@
                 }
             });
 
-
+          
             $("form").submit(function(e) {
                 e.preventDefault();
 
@@ -368,6 +394,7 @@
                 if ($("#chkSinif").prop('checked') === true) {
                     data.ClassId = $("#ClassId").val();
                 }
+                data.CreatedByID = @Session["userId"];
                 $.ajax({
                     type: "POST",
                     url: "/announcement/add",
@@ -377,13 +404,14 @@
                     success: function(response) {
                         if (response === "Success") {
                             $.iziToast.Success();
+                            $("#examples").DataTable().ajax.reload();
                             $("#myModal").modal('hide');
                         } else if (response === "Update") {
                             $.iziToast.Success();
                             $("#examples").DataTable().ajax.reload();
                             $("#myModal").modal('hide');
-                        } else if (response === "Mail Kayıtlı") {
-                            $.iziToast.Info("Girilen mail adresi daha önce sisteme kaydedilmiştir.");
+                        }else if (response === "NoChanges") {
+                            $.iziToast.Info("Herhangi bir değişiklik yapılmadı.");
                         } else {
                             $.iziToast.Warning();
                             alert(response);
@@ -399,102 +427,295 @@
             });
 
 
-            var announcement = '<div id="duyuruTipi" class="timeline-row">' +
-                '<div class="timeline-icon">' +
-                '<div class="arkaplanClass">' +
-                '<i class="timelineIcon"></i>' +
-                '</div>' +
-                '</div>' +
-                '' +
-                '<div class="card">' +
-                '<div class="card-header header-elements-sm-inline">' +
-                '<h6 class="card-title">Baslik:</h6>' +
-                '<div class="header-elements">' +
-                '<span><i class="icon-database-time2 mr-2 text-success"></i>Tarih:</span>' +
-                '</div>' +
-                '</div>' +
-                '' +
-                '<div class="card-body">' +
-                '<blockquote class="blockquote blockquote-bordered py-2 pl-3 mb-0">' +
-                '<p class="mb-2 font-size-base">Aciklama:</p>' +
-                '<footer class="blockquote-footer">Paylasan:</footer>' +
-                '</blockquote>' +
-                '</div>' +
-                '<div class="card-footer d-sm-flex justify-content-sm-between align-items-sm-center">' +
-                '<span>' +
-                '<span class="badge badge-mark border-danger mr-2"></span>' +
-                '<span class="font-weight-semibold">Tipi:</span>' +
-                '</span>' +
-                '</div>' +
-                '</div>' +
-                '</div>';
-          
-
-            var list = [];
-            $('body').loading({
-                stoppable: true,
-                message: 'Duyurular yükleniyor...'
-            });
-            $.getJSON('/json/announcement/' + @Session["userId"],
-                function (json) {
-                   $.each(json,
-                        function(i, value) {
-                            for (var j = 0; j < value.length; j++) {
-                                var res;
-                                if (value[j].AllUser === true) {
-                                    res = announcement.replace("Baslik:", value[j].Title);
-                                    res = res.replace("duyuruTipi", "announcementAll");
-                                    res = res.replace("Aciklama:", value[j].Description);
-                                    res = res.replace("Tarih:", new Date(parseInt(value[j].Date.substr(6))).format("dd.mm.yyyy  HH:MM"));
-                                    res = res.replace("Tipi:", "Genel Duyuru");
-                                    res = res.replace("Paylasan:", "UMUT BABA");
-                                    res = res.replace("arkaplanClass", "bg-warning-400");
-                                    res = res.replace("timelineIcon", "icon-megaphone");
-                                    list.push(res);
-                                } else if (value[j].StudentId !== null) {
-                                    res = announcement.replace("Baslik:", value[j].Title);
-                                    res = res.replace("duyuruTipi", "announcementStudent");
-                                    res = res.replace("Aciklama:", value[j].Description);
-                                    res = res.replace("Tarih:", new Date(parseInt(value[j].Date.substr(6))).format("dd.mm.yyyy  HH:MM"));
-                                    res = res.replace("Tipi:", "Öğrenci Duyurusu");
-                                    res = res.replace("Paylasan:", "UMUT BABA");
-                                    res = res.replace("arkaplanClass", "bg-orange-400");
-                                    res = res.replace("timelineIcon", "icon-user");
-                                    list.push(res);
-                                } else if (value[j].ClassId !== null && value[j].LessonId === null) {
-                                    res = announcement.replace("Baslik:", value[j].Title);
-                                    res = res.replace("duyuruTipi", "announcementClass");
-                                    res = res.replace("Aciklama:", value[j].Description);
-                                    res = res.replace("Tarih:", new Date(parseInt(value[j].Date.substr(6))).format("dd.mm.yyyy  HH:MM"));
-                                    res = res.replace("Tipi:", "Sınıf Duyurusu");
-                                    res = res.replace("Paylasan:", "UMUT BABA");
-                                    res = res.replace("arkaplanClass", "bg-blue-400");
-                                    res = res.replace("timelineIcon", "icon-pencil");
-                                    list.push(res);
-                                } else if (value[j].ClassId !== null && value[j].LessonId !== null) {
-                                    res = announcement.replace("Baslik:", value[j].Title);
-                                    res = res.replace("duyuruTipi", "announcementLesson");
-                                    res = res.replace("Aciklama:", value[j].Description);
-                                    res = res.replace("Tarih:", new Date(parseInt(value[j].Date.substr(6))).format("dd.mm.yyyy  HH:MM"));
-                                    res = res.replace("Tipi:", "Ders Duyurusu");
-                                    res = res.replace("Paylasan:", "UMUT BABA");
-                                    res = res.replace("arkaplanClass", "bg-indigo-400");
-                                    res = res.replace("timelineIcon", "icon-books");
-                                    list.push(res);
-                                }
-                            }
-                        });
-                    document.getElementById('duyurular').innerHTML = list.join("");
-                    $('body').loading('stop');
-                });
-
-            //$("#adminTools").hide();
-            var role = "@Session["roleName"]";
-
-            if (role === "Admin") {
-                $("#adminTools").show();
-            }
         });
     </script>
 
+    @if (Session["roleName"].ToString() != "Admin")
+    {
+        <script type="text/javascript">
+            $(document).ready(function() {
+                getAnnouncement();
+         
+            function getAnnouncement() {
+                $("#duyurular").empty();
+                var announcement = '<div id="duyuruTipi" class="timeline-row">' +
+                    '<div class="timeline-icon">' +
+                    '<div class="arkaplanClass">' +
+                    '<i class="timelineIcon"></i>' +
+                    '</div>' +
+                    '</div>' +
+                    '' +
+                    '<div class="card">' +
+                    '<div class="card-header header-elements-sm-inline">' +
+                    '<h6 class="card-title">Baslik:</h6>' +
+                    '<div class="header-elements">' +
+                    '<span><i class="icon-database-time2 mr-2 text-success"></i>Tarih:</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '' +
+                    '<div class="card-body">' +
+                    '<blockquote class="blockquote blockquote-bordered py-2 pl-3 mb-0">' +
+                    '<p class="mb-2 font-size-base">Aciklama:</p>' +
+                    '<footer class="blockquote-footer">Paylasan:</footer>' +
+                    '</blockquote>' +
+                    '</div>' +
+                    '<div class="card-footer d-sm-flex justify-content-sm-between align-items-sm-center">' +
+                    '<span>' +
+                    '<span class="badge badge-mark border-danger mr-2"></span>' +
+                    '<span class="font-weight-semibold">Tipi:</span>' +
+                    '</span>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>';
+
+
+                var list = [];
+                $('body').loading({
+                    stoppable: true,
+                    message: 'Duyurular yükleniyor...'
+                });
+                $.getJSON('/json/announcement/' + @Session["userId"],
+                    function(json) {
+                        $.each(json,
+                            function(i, value) {
+                                for (var j = 0; j < value.length; j++) {
+                                    var res;
+                                    if (value[j].AllUser === true) {
+                                        res = announcement.replace("Baslik:", value[j].Title);
+                                        res = res.replace("duyuruTipi", "announcementAll");
+                                        res = res.replace("Aciklama:", value[j].Description);
+                                        res = res.replace("Tarih:",
+                                            new Date(parseInt(value[j].Date.substr(6))).format("dd.mm.yyyy  HH:MM"));
+                                        res = res.replace("Tipi:", "Genel Duyuru");
+                                        res = res.replace("Paylasan:", value[j].CreatedBy);
+                                        res = res.replace("arkaplanClass", "bg-warning-400");
+                                        res = res.replace("timelineIcon", "icon-megaphone");
+                                        list.push(res);
+                                    } else if (value[j].StudentId !== null) {
+                                        res = announcement.replace("Baslik:", value[j].Title);
+                                        res = res.replace("duyuruTipi", "announcementStudent");
+                                        res = res.replace("Aciklama:", value[j].Description);
+                                        res = res.replace("Tarih:",
+                                            new Date(parseInt(value[j].Date.substr(6))).format("dd.mm.yyyy  HH:MM"));
+                                        res = res.replace("Tipi:", "Öğrenci: " + value[j].Student);
+                                        res = res.replace("Paylasan:", value[j].CreatedBy);
+                                        res = res.replace("arkaplanClass", "bg-orange-400");
+                                        res = res.replace("timelineIcon", "icon-user");
+                                        list.push(res);
+                                    } else if (value[j].ClassId !== null && value[j].LessonId === null) {
+                                        res = announcement.replace("Baslik:", value[j].Title);
+                                        res = res.replace("duyuruTipi", "announcementClass");
+                                        res = res.replace("Aciklama:", value[j].Description);
+                                        res = res.replace("Tarih:",
+                                            new Date(parseInt(value[j].Date.substr(6))).format("dd.mm.yyyy  HH:MM"));
+                                        res = res.replace("Tipi:", "Sınıf: " + value[j].Class);
+                                        res = res.replace("Paylasan:", value[j].CreatedBy);
+                                        res = res.replace("arkaplanClass", "bg-blue-400");
+                                        res = res.replace("timelineIcon", "icon-pencil");
+                                        list.push(res);
+                                    } else if (value[j].ClassId !== null && value[j].LessonId !== null) {
+                                        res = announcement.replace("Baslik:", value[j].Title);
+                                        res = res.replace("duyuruTipi", "announcementLesson");
+                                        res = res.replace("Aciklama:", value[j].Description);
+                                        res = res.replace("Tarih:",
+                                            new Date(parseInt(value[j].Date.substr(6))).format("dd.mm.yyyy  HH:MM"));
+                                        res = res.replace("Tipi:", "Ders: " + value[j].Lesson);
+                                        res = res.replace("Paylasan:", value[j].CreatedBy);
+                                        res = res.replace("arkaplanClass", "bg-indigo-400");
+                                        res = res.replace("timelineIcon", "icon-books");
+                                        list.push(res);
+                                    }
+                                }
+                            });
+                        document.getElementById('duyurular').innerHTML = list.join("");
+                        $('body').loading('stop');
+                    });
+                }
+            });
+        </script>
+    }
+    @if (Session["roleName"].ToString() == "Admin")
+    {
+        <script type="text/javascript">
+            $(document).ready(function() {
+                
+
+                $('#examples').DataTable({
+                    "ajax": {
+                        "url": '/json/announcement/' + @Session["userId"],
+                        "type": "GET",
+                        "datatype": "json"
+                    },
+                    "paging": false,
+                    "columns": [
+                        { "width": "2%", "title": "#ID", "data": "ID" },
+                        { "title": "Duyuru Başlığı", "data": "Title", "autoWidth": true },
+                        {
+                            "title": "Kimler için?",
+                            "data": "ID",
+                            "searchable": true,
+                            "sortable": true,
+                            "processing": true,
+                            "serverSide": true,
+                            "autoWidth": true,
+                            "render": function(data, type, full, meta) {
+                                if (full.Student != null) {
+                                    return full.Student;
+                                } else if (full.Class !== null) {
+                                    return full.Class;
+                                } else if (full.Lesson !== null) {
+                                    return full.Lesson;
+                                } else if (full.AllUser === true) {
+                                    return "Genel Duyuru";
+                                }
+                                return "";
+                            }
+                        },
+                        { "title": "Duyuruyu Paylaşan", "data": "CreatedBy", "autoWidth": true },
+                        {
+                            "title": "Seçenekler",
+                            "data": "ID",
+                            "width": "5%",
+                            "searchable": true,
+                            "sortable": true,
+                            "processing": true,
+                            "serverSide": true,
+                            "render": function(data, type, full, meta) {
+                                return '<div class="list-icons">' +
+                                    '										<div class="dropdown">' +
+                                    '											<a href="#" class="list-icons-item" data-toggle="dropdown" aria-expanded="false">' +
+                                    '												<i class="icon-menu9"></i>' +
+                                    '											</a>' +
+                                    '' +
+                                    '											<div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-158px, 19px, 0px); top: 0px; left: 0px; will-change: transform;">' +
+                                    '												<a href="#" data-id=' +
+                                    data +
+                                    ' class="update-link dropdown-item"><i class="icon-pen6"></i> Düzenle</a>' +
+                                    '												<a href="#" data-id=' +
+                                    data +
+                                    ' class="delete-link dropdown-item"><i class="icon-trash"></i> Sil</a>' +
+                                    '											</div>' +
+                                    '										</div>' +
+                                    '									</div>';
+                            }
+                        }
+                    ],
+                    autoWidth: false,
+                    dom:
+                        '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
+                    "order":
+                        [[0, "desc"]],
+                    "language":
+                    {
+                        "url":
+                            "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json"
+                    }
+                });
+
+
+                $('#examples tbody').on('click',
+                    'a.delete-link',
+                    function() {
+                        var id = $(this).attr("data-id");
+                        iziToast.question({
+                            timeout: 20000,
+                            close: false,
+                            overlay: true,
+                            displayMode: 'once',
+                            id: 'question',
+                            zindex: 999,
+                            title: 'Dikkat',
+                            message: 'Silmek istediğinize emin misiniz?',
+                            position: 'center',
+                            buttons: [
+                                [
+                                    '<button><b>Evet</b></button>', function(instance, toast) {
+                                        $.ajax({
+                                            type: "POST",
+                                            url: '/announcement/delete/' + id,
+                                            success: function(response) {
+                                                if (response === "Success") {
+                                                    iziToast.success({
+                                                        title: 'Başarılı',
+                                                        message: 'Silme işleminiz gerçekleşmiştir.'
+                                                    });
+                                                    $("#examples").DataTable().ajax.reload();
+                                                } else {
+                                                    iziToast.warning({
+                                                        title: 'Hata',
+                                                        message: 'Lütfen tekrar deneyiniz.'
+                                                    });
+                                                }
+                                            }
+                                        });
+                                        instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                                    }, true
+                                ],
+                                [
+                                    '<button>Hayır</button>', function(instance, toast) {
+
+                                        instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                                    }
+                                ]
+                            ]
+                        });
+
+                    });
+
+
+                $('#examples tbody').on('click',
+                    'a.update-link',
+                    function() {
+                        var id = $(this).attr("data-id");
+                        $.ajax({
+                            url: '/json/announcement/details/' + id,
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function(data) {
+                                $(".modal-title").html("Güncelle");
+                                $("#ID").val(data.data[0].ID);
+
+                                $('#title').val(data.data[0].Title);
+                                $('#summernote').summernote('code', data.data[0].Description);
+                                if (data.data[0].AllUser === true) {
+                                    $("#chkGenel").prop('checked');
+                                }
+
+                                if (data.data[0].StudentId !== null) {
+                                    $("#Studentd").select2("trigger",
+                                        "select",
+                                        { data: { text: data.data[0].Student, id: data.data[0].StudentId } });
+
+                                }
+                                if (data.data[0].LessonId !== null) {
+                                    $("#LessonId").select2("trigger",
+                                        "select",
+                                        { data: { text: data.data[0].Lesson, id: data.data[0].LessonId } });
+                                }
+                                if (data.data[0].ClassId !== null) {
+                                    $("#ClassId").select2("trigger",
+                                        "select",
+                                        { data: { text: data.data[0].Class, id: data.data[0].ClassId } });
+                                }
+
+
+                                $("#myModal").modal('show');
+
+
+                            },
+                            error: function(err) {
+                                alert("Error: " + err.responseText);
+                            }
+                        });
+
+
+                    });
+
+
+            });
+        </script>
+
+    }
 }

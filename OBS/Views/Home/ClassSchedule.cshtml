@@ -108,6 +108,8 @@
 
     @if (Session["roleName"].ToString() == "Student" || Session["roleName"].ToString() == "Teacher")
     {
+        <h4>Sınıf: @Session["className"]</h4>
+        <hr/>
         <div class="cd-schedule loading">
 
             <div class="events">

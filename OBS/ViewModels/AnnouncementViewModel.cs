@@ -25,6 +25,8 @@ namespace OBS.ViewModels
         public int? ClassId { get; set; }
 
         public int? LessonId { get; set; }
+        public int? CreatedByID { get; set; }
+        public string CreatedBy { get; set; }
     }
 
     public class AnnouncementListViewModel

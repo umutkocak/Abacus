@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Migrations;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -103,6 +104,12 @@ namespace OBS.Controllers
 
         [Route("announcement")]
         public ActionResult Announcement()
+        {
+            return View();
+        }
+
+        [Route("user/changepassword")]
+        public ActionResult ChangePassword()
         {
             return View();
         }
@@ -285,6 +292,73 @@ namespace OBS.Controllers
             return Json(us, JsonRequestBehavior.AllowGet);
         }
 
+        [Route("user/changepassword")]
+        [HttpPost]
+        public JsonResult ChangePassword(Users us, string oldPassword)
+        {
+            if (us.ID > 0)
+            {
+                var user = _db.Users.FirstOrDefault(x => x.ID == us.ID);
+                if (user != null)
+                {
+                    if (user.Password == oldPassword)
+                    {
+                        var data = new Users
+                        {
+                            ID = us.ID,
+                            CreatedDate = user.CreatedDate,
+                            Password = us.Password,
+                            Email = user.Email,
+                            StudentId = user.StudentId,
+                            TeacherId = user.TeacherId,
+                            Username = user.Username
+                        };
+                        //_db.Entry(data).State = EntityState.Modified;
+                        _db.Set<Users>().AddOrUpdate(data);
+
+                        return Json(_db.SaveChanges() > 0 ? "Update" : "NoChanges");
+                    }
+                    else
+                    {
+                        return Json("Incorrect");
+                    }
+                }
+            }
+            else if (us.Username != null)
+            {
+                var user = _db.Users.FirstOrDefault(x => x.Username == us.Username);
+                if (user != null)
+                {
+                    if (user.Username == us.Username)
+                    {
+                        var data = new Users
+                        {
+                            ID = us.ID,
+                            CreatedDate = user.CreatedDate,
+                            Password = us.Password,
+                            Email = user.Email,
+                            StudentId = user.StudentId,
+                            TeacherId = user.TeacherId,
+                            Username = user.Username
+                        };
+                        //_db.Entry(data).State = EntityState.Modified;
+                        _db.Set<Users>().AddOrUpdate(data);
+
+                        return Json(_db.SaveChanges() > 0 ? "Update" : "NoChanges");
+                    }
+                    else
+                    {
+                        return Json("Incorrect");
+                    }
+                }
+            }
+            else
+            {
+                return Json("Error");
+            }
+            return Json(null, JsonRequestBehavior.AllowGet);
+        }
+
         #endregion
 
         #region Users
@@ -311,8 +385,7 @@ namespace OBS.Controllers
             }
             return Json(new { data = dataList }, JsonRequestBehavior.AllowGet);
         }
-
-
+        
         [Route("users/details/{id?}"), HttpGet]
         public JsonResult UsersDetails(int? id)
         {
@@ -1059,7 +1132,8 @@ namespace OBS.Controllers
         [Route("announcement/add"), HttpPost]
         public JsonResult AnnouncementAdd(AnnouncementViewModel model)
         {
-
+            var date = _db.Announcements.FirstOrDefault(x => x.ID == model.ID)?.Date;
+            var createdby = _db.Announcements.FirstOrDefault(x => x.ID == model.ID)?.CreatedBy;
             if (ModelState.IsValid)
             {
                 if (model.ID > 0)
@@ -1072,10 +1146,14 @@ namespace OBS.Controllers
                         Title = model.Title,
                         AllUser = model.AllUser,
                         LessonId = model.LessonId,
-                        Description = model.Description
+                        Description = model.Description,
+                        Date = date,
+                        CreatedBy = createdby
                     };
-                    _db.Entry(data).State = EntityState.Modified;
-                    return Json(_db.SaveChanges() > 0 ? "Update" : "Error");
+                    //_db.Entry(data).State = EntityState.Modified;
+                    _db.Set<Announcements>().AddOrUpdate(data);
+
+                    return Json(_db.SaveChanges() > 0 ? "Update" : "NoChanges");
                 }
                 else
                 {
@@ -1088,7 +1166,8 @@ namespace OBS.Controllers
                         Title = model.Title,
                         AllUser = model.AllUser,
                         LessonId = model.LessonId,
-                        Description = model.Description
+                        Description = model.Description,
+                        CreatedBy = model.CreatedByID
                     };
                     _db.Announcements.Add(data);
                     return Json(_db.SaveChanges() > 0 ? "Success" : "Error");
@@ -1096,6 +1175,49 @@ namespace OBS.Controllers
             }
 
             return Json(model, JsonRequestBehavior.AllowGet);
+        }
+
+        [Route("json/announcement/details/{id?}")]
+        public JsonResult AnnouncementDetail(int? id)
+        {
+            var data = new List<AnnouncementListViewModel>();
+            var dataList = _db.Announcements.Where(x=> x.ID == id).ToList();
+
+            foreach (var i in dataList)
+            {
+                data.Add(new AnnouncementListViewModel
+                {
+                    ID = i.ID,
+                    StudentId = i.StudentId,
+                    ClassId = i.ClassId,
+                    AllUser = i.AllUser,
+                    Date = i.Date,
+                    Description = i.Description,
+                    LessonId = i.LessonId,
+                    Title = i.Title,
+                    Lesson = _db.Lesson.FirstOrDefault(x => x.ID == i.LessonId)?.LessonName,
+                    Class = _db.Classes.FirstOrDefault(x => x.ID == i.ClassId)?.ClassName,
+                    Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName,
+                    CreatedByID = _db.Teachers.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID,
+                    CreatedBy = _db.Teachers.FirstOrDefault(x => x.ID == i.CreatedBy)?.FullName ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.Username,
+                });
+            }
+
+            return Json(new {data = data}, JsonRequestBehavior.AllowGet);
+        }
+
+        [Route("announcement/delete/{id?}")]
+        [HttpPost]
+        public JsonResult AnnouncementDelete(int id)
+        {
+            var anc = _db.Announcements.ToList().Find(x => x.ID == id);
+            if (anc != null)
+            {
+                _db.Announcements.Remove(anc);
+                return Json(_db.SaveChanges() > 0 ? "Success" : "Error");
+            }
+
+            return Json(anc, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -1112,7 +1234,7 @@ namespace OBS.Controllers
 
             var tchId = _db.Users.FirstOrDefault(x => x.ID == id)?.TeacherId;
             var stdId = _db.Users.FirstOrDefault(x => x.ID == id)?.StudentId;
-            var userId = _db.Users.FirstOrDefault(x => x.ID == id)?.ID;
+            var userId = _db.Users.FirstOrDefault(x => x.ID == id && x.TeacherId == null && x.StudentId == null)?.ID;
 
             var tch = _db.Teachers.FirstOrDefault(x => x.ID == tchId);
             var std = _db.Students.FirstOrDefault(x => x.ID == stdId);
@@ -1120,39 +1242,13 @@ namespace OBS.Controllers
 
             //Siteme giriş yapan kullanıcı eğer öğrenciyse sınıfının Id'sini atar.
             var stdClassId = _db.ClassStudents.FirstOrDefault(x => x.StudentID == stdId)?.Classes.ID;
+            var tchClassId = _db.Users.FirstOrDefault(x => x.TeacherId == tchId)?.ID;
             if (stdClassId != null)
             {
                 var list = _db.Announcements.Where(x => x.AllUser == true || x.StudentId == stdId || x.ClassId == stdClassId).OrderByDescending(x => x.Date).ToList();
                 foreach (var i in list)
                 {
-
-                    data.Add(new AnnouncementListViewModel
-                    {
-                        ID = i.ID,
-                        StudentId = i.StudentId,
-                        ClassId = i.ClassId,
-                        AllUser = i.AllUser,
-                        Date = i.Date,
-                        Description = i.Description,
-                        LessonId = i.LessonId,
-                        Title = i.Title,
-                        Lesson = _db.Lesson.FirstOrDefault(x => x.ID == i.LessonId)?.LessonName,
-                        Class = _db.Classes.FirstOrDefault(x => x.ID == i.ClassId)?.ClassName,
-                        Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName,
-                        CreatedByID = _db.Teachers.FirstOrDefault(x=> x.ID == i.CreatedBy)?.ID ?? _db.Users.FirstOrDefault(x=> x.ID == i.CreatedBy)?.ID,
-                        CreatedBy = _db.Teachers.FirstOrDefault(x => x.ID == i.CreatedBy)?.FullName ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.Username,
-                    });
-                }
-                return Json(new { data = data }, JsonRequestBehavior.AllowGet);
-            }
-            //Siteme giriş yapan kullanıcı eğer öğretmense ve hangi sınıfın öğretmeniyse o sınıfın Id'sini atar.
-            var tchClassId = _db.Classes.FirstOrDefault(x => x.TeacherID == tchId)?.ID;
-            if (tchClassId != null)
-            {
-                var datalist = _db.Announcements.Where(x => x.CreatedBy == tchId).ToList();
-
-                foreach (var i in datalist)
-                {
+                    var createdId = _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.TeacherId ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID;
                     data.Add(new AnnouncementListViewModel
                     {
                         ID = i.ID,
@@ -1167,14 +1263,68 @@ namespace OBS.Controllers
                         Class = _db.Classes.FirstOrDefault(x => x.ID == i.ClassId)?.ClassName,
                         Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName,
                         CreatedByID = _db.Teachers.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID,
-                        CreatedBy = _db.Teachers.FirstOrDefault(x => x.ID == i.CreatedBy)?.FullName ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.Username,
+                        CreatedBy = _db.Teachers.FirstOrDefault(x => x.ID == createdId)?.FullName ?? _db.Users.FirstOrDefault(x => x.ID == createdId)?.Username
                     });
                 }
                 return Json(new { data = data }, JsonRequestBehavior.AllowGet);
             }
+            //Siteme giriş yapan kullanıcı eğer öğretmense ve hangi sınıfın öğretmeniyse o sınıfın Id'sini atar.
+            else if (tchId != null)
+            {
+                var datalist = _db.Announcements.Where(x => x.CreatedBy == id).ToList();
+                foreach (var i in datalist.OrderByDescending(x=> x.Date))
+                {
+                    var teacherId = _db.Users.FirstOrDefault(x => x.TeacherId == i.CreatedBy)?.TeacherId;
 
-            return Json(null, JsonRequestBehavior.AllowGet);
+                    data.Add(new AnnouncementListViewModel
+                    {
+                        ID = i.ID,
+                        StudentId = i.StudentId,
+                        ClassId = i.ClassId,
+                        AllUser = i.AllUser,
+                        Date = i.Date,
+                        Description = i.Description,
+                        LessonId = i.LessonId,
+                        Title = i.Title,
+                        Lesson = _db.Lesson.FirstOrDefault(x => x.ID == i.LessonId)?.LessonName,
+                        Class = _db.Classes.FirstOrDefault(x => x.ID == i.ClassId)?.ClassName,
+                        Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName,
+                        CreatedByID = _db.Teachers.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID,
+                        CreatedBy = _db.Teachers.FirstOrDefault(x => x.ID == tchId)?.FullName ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.Username,
+                    });
+                }
+                return Json(new { data = data }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                var dataList = _db.Announcements.ToList();
+
+                foreach (var i in dataList)
+                {
+                    var ogrId = _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.TeacherId;
+                    data.Add(new AnnouncementListViewModel
+                    {
+                        ID = i.ID,
+                        StudentId = i.StudentId,
+                        ClassId = i.ClassId,
+                        AllUser = i.AllUser,
+                        Date = i.Date,
+                        Description = i.Description,
+                        LessonId = i.LessonId,
+                        Title = i.Title,
+                        Lesson = _db.Lesson.FirstOrDefault(x => x.ID == i.LessonId)?.LessonName,
+                        Class = _db.Classes.FirstOrDefault(x => x.ID == i.ClassId)?.ClassName,
+                        Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName,
+                        CreatedByID = ogrId ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID,
+                        CreatedBy = _db.Teachers.FirstOrDefault(x => x.ID == ogrId)?.FullName ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.Username
+                    });
+                }
+            }
+
+            return Json(new { data = data }, JsonRequestBehavior.AllowGet);
         }
+
+
         #endregion
 
         #region Select2 Datas
@@ -1239,7 +1389,7 @@ namespace OBS.Controllers
         {
             var teacherFind = _db.Users.FirstOrDefault(x => x.ID == id)?.TeacherId;
             var lessonFind = _db.Teachers.FirstOrDefault(x => x.ID == teacherFind);
-            var teacherClass = _db.Classes.FirstOrDefault(x => x.ID == lessonFind.ID);
+            var teacherClass = _db.Classes.FirstOrDefault(x => x.TeacherID == lessonFind.ID);
             var classList = _db.ClassStudents.Where(x => x.ClassId == teacherClass.ID).ToList();
             var list2 = classList.Select(a => new
             {

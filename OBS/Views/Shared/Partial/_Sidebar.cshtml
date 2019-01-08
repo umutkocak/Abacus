@@ -75,7 +75,6 @@
     <!-- /sidebar mobile toggler -->
     <!-- Sidebar content -->
     <div class="sidebar-content">
-
         <!-- User menu -->
         <div class="sidebar-user">
             <div class="card-body">
@@ -83,7 +82,6 @@
                     <div class="mr-3">
                         <a href="#"><img src="~/Uploads/@Session["picture"]" width="38" height="38" class="rounded-circle" alt=""></a>
                     </div>
-
                     <div class="media-body">
                         <div class="media-title font-weight-semibold">@Session["userName"]</div>
                         <div class="font-size-xs opacity-50">
@@ -98,11 +96,11 @@
                             }
                             else
                             {
-                                @Html.Label("Öğrenci")
+                                @Html.Label("Sınıfı: ")
+                                @Session["className"].ToString();
                             }
                         </div>
                     </div>
-
                     <div class="ml-3 align-self-center">
                         <a href="@Url.Action("LogOut","Home")" class="text-white"><i class="icon-switch2"></i></a>
                     </div>
@@ -142,31 +140,70 @@
                             <span>Sınav Notlarım</span>
                         </a>
                     </li>
-                }
 
+                    <li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs"> Ayarlar</div> <i class="icon-menu" title="Ayarlar"></i></li>
+                    <li class="nav-item">
+                        <a href="#0" class="nav-link" data-popup="tooltip" title="" data-placement="right" data-original-title="Yakında">
+                            <i class="icon-spinner9 spinner"></i>
+                            <span>Profilimi Düzenle</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/user/changepassword" class="nav-link">
+                            <i class="icon-key"></i>
+                            <span>Şifremi Değiştir</span>
+                        </a>
+                    </li>
+                }
                 @if (status == "Teacher")
                 {
-                    <li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Sınıf Yönetimi</div> <i class="icon-menu" title="Main"></i></li>
-                   
+                    <li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Sınıf Yönetimi</div> <i class="icon-menu" title="Sınıf Yönetimi"></i></li>
+
+                    <li class="nav-item">
+                        <a href="/announcement" class="nav-link">
+                            <i class="icon-megaphone"></i>
+                            <span>Duyurular</span>
+                        </a>
+                    </li>
+
                     <li class="nav-item">
                         <a href="/class/schedule" class="nav-link">
                             <i class="icon-calendar22"></i>
-                            <span>Ders Programı</span>
+                            <span>Ders Programım</span>
                         </a>
                     </li>
-                    
+
+                    <li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs"> Ayarlar</div> <i class="icon-menu" title="Ayarlar"></i></li>
+                    <li class="nav-item">
+                        <a href="#0" class="nav-link" data-popup="tooltip" title="" data-placement="right" data-original-title="Yakında">
+                            <i class="icon-spinner9 spinner"></i>
+                            <span>Profilimi Düzenle</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/user/changepassword" class="nav-link">
+                            <i class="icon-key"></i>
+                            <span>Şifremi Değiştir</span>
+                        </a>
+                    </li>
+
                 }
                 <!-- /main -->
                 <!-- admin -->
                 @if (status == "Admin")
                 {
-                    <li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Akademik</div> <i class="icon-menu" title="Main"></i></li>
+                    <li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Akademik</div> <i class="icon-menu" title="Akademik"></i></li>
+                    <li class="nav-item">
+                        <a href="/announcement" class="nav-link">
+                            <i class="icon-megaphone"></i>
+                            <span>Duyurular</span>
+                        </a>
+                    </li>
                     <li class="nav-item nav-item-submenu">
                         <a href="#" class="nav-link"><i class="icon-library2"></i> <span>Sınıf İşlemleri</span></a>
                         <ul class="nav nav-group-sub" data-submenu-title="Sınıf İşlemleri">
                             <li class="nav-item"><a href="/class" class="nav-link">  <i class="icon-users2"></i> Sınıflar </a></li>
                             <li class="nav-item"><a href="/class/students" class="nav-link">  <i class="icon-reading"></i> Sınıf Listesi </a></li>
-                               
                             <li class="nav-item">
                                 <a href="/class/schedule" class="nav-link">
                                     <i class="icon-calendar22"></i>
@@ -183,7 +220,7 @@
                         </a>
                     </li>
 
-                    <li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Yönetim</div> <i class="icon-menu" title="Main"></i></li>
+                    <li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Yönetim</div> <i class="icon-menu" title="Yönetim"></i></li>
 
                     <li class="nav-item nav-item-submenu">
                         <a href="#" class="nav-link"><i class="icon-graduation2"></i> <span>Öğretmenler</span></a>
@@ -205,15 +242,26 @@
                             <span>Kullanıcılar</span>
                         </a>
                     </li>
-                }
 
+                    <li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs"> Ayarlar</div> <i class="icon-menu" title="Ayarlar"></i></li>
+                    <li class="nav-item">
+                        <a href="#0" class="nav-link" data-popup="tooltip" title="" data-placement="right" data-original-title="Yakında">
+                            <i class="icon-spinner9 spinner"></i>
+                            <span>Profilimi Düzenle</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/user/changepassword" class="nav-link">
+                            <i class="icon-key"></i>
+                            <span>Şifremi Değiştir</span>
+                        </a>
+                    </li>
+                }
                 <!--admin -->
             </ul>
         </div>
         <!-- /main navigation -->
-
     </div>
     <!-- /sidebar content -->
-
 </div>
 <!-- /main sidebar -->
