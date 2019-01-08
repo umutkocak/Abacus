@@ -114,6 +114,12 @@ namespace OBS.Controllers
             return View();
         }
 
+        [Route("user/profile")]
+        public ActionResult Profile()
+        {
+            return View();
+        }
+
         #endregion
 
         #region JsonResults
@@ -359,6 +365,40 @@ namespace OBS.Controllers
             return Json(null, JsonRequestBehavior.AllowGet);
         }
 
+        #endregion
+
+        #region User Profile
+
+        [Route("user/profile/change"), HttpPost]
+        public JsonResult ProfileEdit(Users us, string password)
+        {
+            if (us.ID > 0)
+            {
+                var user = _db.Users.FirstOrDefault(x => x.ID == us.ID);
+                if (user != null && user.Password == password)
+                {
+                    var data = new Users
+                    {
+                        ID = us.ID,
+                        Email = us.Email,
+                        Username = us.Username,
+                        CreatedDate = user.CreatedDate,
+                        Password = user.Password,
+                        StudentId = user.StudentId,
+                        TeacherId = user.TeacherId
+                    };
+
+                    _db.Set<Users>().AddOrUpdate(data);
+                    return Json(_db.SaveChanges() > 0 ? "Update" : "NoChanges");
+                }
+                else
+                {
+                    return Json("Incorrect");
+                }
+            }
+
+            return Json(null, JsonRequestBehavior.AllowGet);
+        }
         #endregion
 
         #region Users

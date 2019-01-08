@@ -2726,6 +2726,7 @@
     <Content Include="Views\Home\ClassSchedule.cshtml" />
     <Content Include="Views\Home\Announcement.cshtml" />
     <Content Include="Views\Home\ChangePassword.cshtml" />
+    <Content Include="Views\Home\Profile.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

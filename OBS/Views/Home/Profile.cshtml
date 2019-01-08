@@ -1,0 +1,263 @@
+﻿@using OBS.Models
+
+@{
+    ViewBag.Title = "Hesap Bilgilerim - ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    OBSEntities _db = new OBSEntities();
+}
+
+
+<div class="row" ng-app="">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header header-elements-inline">
+                <h5 class="card-title">Profil Bilgilerim</h5>
+            </div>
+            <div class="card-body">
+                <form id="form">
+                    <div class="modal-body">
+                        <input type="text" id="ID" hidden="" value="@Session["userId"]" class="form-control">
+                        <div class="form-group">
+                            <label>Adınız Soyadınız</label>
+                            <input type="text" id="Username" value="@Session["userName"]" class="form-control" disabled="">
+                        </div>
+                        @if (Session["roleName"].ToString() == "Student")
+                        {
+                            var userId = Convert.ToInt32(Session["userId"]);
+                            var stdId = _db.Users.FirstOrDefault(x => x.ID == userId);
+                            var std = _db.Students.FirstOrDefault(x => x.ID == stdId.StudentId);
+                            var stdClass = _db.ClassStudents.FirstOrDefault(x => x.StudentID == stdId.StudentId)?.Classes.ClassName;
+
+                            if (std != null)
+                            {
+                                <div class="form-group">
+                                    <label>Resminiz</label>
+                                    <img src="/Uploads/@std.Picture" class="card-img-actions-overlay card-img" />
+                                </div>
+
+                                if (stdId != null)
+                                {
+                                    <div class="form-group row">
+                                        <div class="col-md-6">
+                                            <label>Kullanıcı Adınız</label>
+                                            <input id="username" type="text" value="@stdId.Username" class="form-control" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Mail Adresiniz</label>
+                                            <input id="email" type="email" value="@stdId.Email" class="form-control" />
+                                        </div>
+                                    </div>
+                                }
+
+                                <div class="form-group row">
+                                    <div class="col-md-6">
+                                        <label>TC Kimlik Numaranız</label>
+                                        <input type="text" value="@std.TCNumber" class="form-control" disabled="disabled" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Öğrenci Numaranız</label>
+                                        <input type="text" value="@std.StudentNumber" class="form-control" disabled="disabled" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-md-6">
+                                        <label>Sınıfınız</label>
+                                        <input type="text" value="@stdClass" class="form-control" disabled="disabled" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Öğrenci Numaranız</label>
+                                        <input type="text" value="@($"{std.Birthday: dd/MM/yyyy}")" class="form-control" disabled="disabled" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-md-12 mt-2">
+                                        <h3>Veli Bilgileri</h3>
+                                        <hr />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Adı Soyadı</label>
+                                        <input type="text" value="#" class="form-control" disabled="disabled" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Cep Telefonu</label>
+                                        <input type="text" value="#" class="form-control" disabled="disabled" />
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else if (Session["roleName"].ToString() == "Teacher")
+                        {
+                            var userId = Convert.ToInt32(Session["userId"]);
+                            var tchId = _db.Users.FirstOrDefault(x => x.ID == userId);
+                            var tch = _db.Teachers.FirstOrDefault(x => x.ID == tchId.TeacherId);
+                            var tchClass = _db.Classes.FirstOrDefault(x => x.TeacherID == tchId.TeacherId)?.ClassName;
+                            if (tch != null)
+                            {
+                                <div class="form-group">
+                                    <label>Resminiz</label>
+                                    <img src="/Uploads/@tch.Picture" class="card-img-actions-overlay card-img" />
+                                </div>
+
+                                if (tchId != null)
+                                {
+                                    <div class="form-group row">
+                                        <div class="col-md-6">
+                                            <label>Kullanıcı Adınız</label>
+                                            <input id="username" type="text" value="@tchId.Username" class="form-control" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Mail Adresiniz</label>
+                                            <input id="email" type="email" value="@tchId.Email" class="form-control" />
+                                        </div>
+                                    </div>
+                                }
+
+                                <div class="form-group row">
+
+                                    <div class="col-md-3">
+                                        <label>TC Kimlik Numaranız</label>
+                                        <input type="text" value="@tch.TCNumber" class="form-control" disabled="disabled" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label>Sınıfınız</label>
+                                        <input type="text" value="@tchClass" class="form-control" disabled="disabled" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label>Doğum Tarihiniz</label>
+                                        <input type="text" value="@($"{tch.Birthday: dd/MM/yyyy}")" class="form-control" disabled="disabled" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label>Uzmanlık Alanı</label>
+                                        <input type="text" value="@tch.Professions.Profession" class="form-control" disabled="disabled" />
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else if (Session["roleName"].ToString() == "Admin")
+                        {
+
+                            var userId = Convert.ToInt32(Session["userId"]);
+                            var user = _db.Users.FirstOrDefault(x => x.ID == userId);
+                            <div class="form-group">
+                                <label>Resminiz</label>
+                                <img src="/Uploads/@Session["picture"]" class="card-img-actions-overlay card-img" />
+                            </div>
+
+                            if (user != null)
+                            {
+                                <div class="form-group row">
+                                    <div class="col-md-6">
+                                        <label>Kullanıcı Adınız</label>
+                                        <input id="username" type="text" value="@user.Username" class="form-control" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Mail Adresiniz</label>
+                                        <input id="email" type="email" value="@user.Email" class="form-control" />
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Düzenle <i class="icon-database-check ml-2"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var isValidate = false;
+            function formKontrol() {
+                if ($("#username").val().length <= 0) {
+                    $("#username").attr("placeholder", "Zorunlu alan (*)").focus();
+                    isValidate = false;
+                } else if ($("#email").val().length <= 0) {
+                    $("#email").attr("placeholder", "Zorunlu alan (*)").focus();
+                    isValidate = false;
+                } else {
+                    isValidate = true;
+                }
+            }
+
+            $("form").submit(function (e) {
+                e.preventDefault();
+           
+
+                formKontrol();
+
+                if (isValidate === true) {
+                    iziToast.question({
+                        drag: false,
+                        close: false,
+                        overlay: true,
+                        timeout: 10000,
+                        title: '',
+                        message: 'Şifrenizi giriniz',
+                        position: 'center',
+                        inputs: [
+                            ['<input type="password">', 'keyup', function (instance, toast, input, e) {
+                                console.info(input.value);
+                            }, true] // true to focus
+                        ],
+                        buttons: [
+                            ['<button><b>Şifreyi Doğrula</b></button>', function (instance, toast, button, e, inputs) {
+
+
+
+                                var data = new Object();
+                                data.ID = $("#ID").val();
+                                data.Username = $("#username").val();
+                                data.Email = $("#email").val();
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/user/profile/change",
+                                    data: JSON.stringify({ us: data, password: inputs[0].value}),
+                                    contentType: "application/json; charset=utf-8",
+                                    dataType: "json",
+                                    success: function (response) {
+                                        if (response === "Update") {
+                                            $.iziToast.Success();
+                                            $.iziToast.Info("Bilgileriniz değiştirilmiştir.");
+                                            setTimeout(function(){ location.reload(); }, 3000);
+                                        } else if (response === "NoChanges") {
+                                            $.iziToast.Info("Herhangi bir değişiklik yapmadınız.");
+                                        } else if (response === "Incorrect") {
+                                            $.iziToast.Info("Şifrenizi hatalı girdiniz.");
+                                        } else {
+                                            $.iziToast.Warning();
+                                        }
+                                    },
+                                    failure: function (response) {
+                                        alert(response.responseText);
+                                    },
+                                    error: function (response) {
+                                        alert(response.responseText);
+                                    }
+                                });
+
+
+                                instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                            }, false], // true to focus
+
+                            ['<button><b>Vazgeç</b></button>', function (instance, toast, button, e, inputs) {
+
+                                instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                            }, false] // true to focus
+
+                        ]
+                    });
+                }
+
+
+            });
+        });
+    </script>
+}
