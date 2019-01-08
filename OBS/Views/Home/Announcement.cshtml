@@ -30,11 +30,11 @@
                     <div class="card-header">
                         @if (Session["roleName"].ToString() == "Student")
                         {
-                            <button id="allDisplay" type="button" class="btn btn-primary"><i class="icon-megaphone"></i> &nbsp; Hepsini Göster</button>
+                        <button id="allDisplay" type="button" class="btn btn-primary mt-1">  <span class="badge bg-grey-800 badge-pill" id="allCount"></span>&nbsp; <i class="icon-megaphone"></i>&nbsp; Hepsini Göster</button>
 
-                            <button id="allClass" type="button" class="btn btn-success pull-right">Sınıf &nbsp;  <i class="icon-pencil6"></i> </button>
-                            <button id="allLesson" type="button" class="btn btn-default bg-indigo">Ders &nbsp;  <i class="icon-books"></i> </button>
-                            <button id="allStudent" type="button" class="btn btn-default bg-indigo">Bana Özel &nbsp;  <i class="icon-user"></i> </button>
+                            <button id="allClass" type="button" class="btn btn-success pull-right mt-1">  <span class="badge bg-grey-800 badge-pill" id="classCount"></span> &nbsp; Sınıf &nbsp;  <i class="icon-pencil6"></i> </button>
+                            <button id="allLesson" type="button" class="btn btn-default bg-indigo mt-1 pull-right"> <span class="badge bg-grey-800 badge-pill" id="lessonCount"></span> &nbsp; Ders &nbsp;  <i class="icon-books"></i> </button>
+                            <button id="allStudent" type="button" class="btn btn-default bg-brown-400 mt-1"> <span class="badge bg-grey-800 badge-pill" id="studentCount"></span> &nbsp; Bana Özel &nbsp;  <i class="icon-user"></i> </button>
                         }
                         @if (Session["roleName"].ToString() == "Teacher")
                         {
@@ -529,8 +529,17 @@ else
                             });
                         document.getElementById('duyurular').innerHTML = list.join("");
                         $('body').loading('stop');
+                        var lessonCount = ($("#announcementLesson").length > 0) ? $("#announcementLesson").length : 0;
+                        var studentCount = ($("#announcementStudent").lenght > 0) ? $("#announcementStudent").lenght : 0;
+                        var classCount = ($("#announcementClass").length > 0 ? $("#announcementClass").length : 0);
+                        var allCount = $("#allCount").length + classCount + lessonCount + studentCount;
+                        $("#lessonCount").html(lessonCount);
+                        $("#studentCount").html(studentCount);
+                        $("#classCount").html(classCount);
+                        $("#allCount").html(allCount);
                     });
                 }
+              
             });
         </script>
     }

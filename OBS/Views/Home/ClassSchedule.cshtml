@@ -108,8 +108,29 @@
 
     @if (Session["roleName"].ToString() == "Student" || Session["roleName"].ToString() == "Teacher")
     {
-        <h4>Sınıf: @Session["className"]</h4>
-        <hr/>
+        <div class="row">
+            @if (Session["className"] != null)
+            {
+                <span class="card-body badge"><h3>Sınıfınız : @Session["className"]</h3></span>
+            }
+
+            @if (Session["roleName"].ToString() == "Teacher")
+            {
+
+                OBSEntities _db = new OBSEntities();
+                var userId = Convert.ToInt32(Session["userId"]);
+                var tchFind = _db.Users.FirstOrDefault(x => x.TeacherId == userId || x.ID == userId)?.TeacherId;
+                var tchClass = _db.Classes.FirstOrDefault(x => x.TeacherID == tchFind)?.ClassName;
+                if (tchClass != null)
+                {
+                    <span class="card-body badge"><h3>Sınıfınız : @tchClass</h3></span>
+
+                }
+
+            }
+
+            <hr />
+        </div>
         <div class="cd-schedule loading">
 
             <div class="events">
@@ -286,7 +307,7 @@
                             for (var j = 0; j < value.length; j++) {
                                 if (value[j].Schedule.Day === "Pazartesi") {
                                     pazartes.push(
-                                        '<li class="single-event" data-start="' + value[j].Schedule.StartTime + '" data-end="' + value[j].Schedule.EndTime + '" data-content="event-restorative-yoga" data-event="' + value[j].Schedule.Color + '"> <a href="#0" data-id="' + value[j].ID + '" class="update-link"> <span class="event-date">' + value[j].Schedule.StartTime + ' - ' + value[j].Schedule.EndTime + '</span> <em class="event-name">' + value[j].Schedule.Lesson + '</em> </a></li>');   
+                                        '<li class="single-event" data-start="' + value[j].Schedule.StartTime + '" data-end="' + value[j].Schedule.EndTime + '" data-content="event-restorative-yoga" data-event="' + value[j].Schedule.Color + '"> <a href="#0" data-id="' + value[j].ID + '" class="update-link"> <span class="event-date">' + value[j].Schedule.StartTime + ' - ' + value[j].Schedule.EndTime + '</span> <em class="event-name">' + value[j].Schedule.Lesson + '</em> </a></li>');
                                 } else if (value[j].Schedule.Day === "Salı") {
                                     var sali =
                                         '<li class="single-event" data-start="' + value[j].Schedule.StartTime + '" data-end="' + value[j].Schedule.EndTime + '" data-content="event-restorative-yoga" data-event="' + value[j].Schedule.Color + '"> <a href="#0" data-id="' + value[j].ID + '" class="update-link"><span class="event-date">' + value[j].Schedule.StartTime + ' - ' + value[j].Schedule.EndTime + '</span> <em class="event-name">' + value[j].Schedule.Lesson + '</em> </a></li>';
