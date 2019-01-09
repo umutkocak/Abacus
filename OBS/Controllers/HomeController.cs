@@ -204,7 +204,7 @@ namespace OBS.Controllers
                                                   _db.Students.FirstOrDefault(x => x.ID == std.StudentId)?.FullName ??
                                                   std.Username;
                             Session["picture"] = _db.Teachers.FirstOrDefault(x => x.ID == std.TeacherId)?.Picture ??
-                                                  _db.Students.FirstOrDefault(x => x.ID == std.StudentId)?.Picture ?? "default.png";
+                                                  _db.Students.FirstOrDefault(x => x.ID == std.StudentId)?.Picture ?? _db.Users.FirstOrDefault(x=> x.Username == us.Username)?.Picture;
                             return Json("yes");
                         }
                         else
@@ -228,7 +228,7 @@ namespace OBS.Controllers
                                                       _db.Students.FirstOrDefault(x => x.ID == tch.StudentId)?.FullName ??
                                                       tch.Username;
                                 Session["picture"] = _db.Teachers.FirstOrDefault(x => x.ID == tch.TeacherId)?.Picture ??
-                                                     _db.Students.FirstOrDefault(x => x.ID == tch.StudentId)?.Picture ?? "default.png";
+                                                     _db.Students.FirstOrDefault(x => x.ID == tch.StudentId)?.Picture ?? _db.Users.FirstOrDefault(x => x.Username == us.Username)?.Picture;
                                 return Json("yes");
                             }
                             else
@@ -260,9 +260,8 @@ namespace OBS.Controllers
                                           _db.Students.FirstOrDefault(x => x.ID == isValidate.StudentId)?.FullName ??
                                           isValidate.Username;
                     Session["picture"] = _db.Teachers.FirstOrDefault(x => x.ID == isValidate.TeacherId)?.Picture ??
-                                         _db.Students.FirstOrDefault(x => x.ID == isValidate.StudentId)?.Picture ?? "default.png";
-                    Session["className"] = _db.ClassStudents.FirstOrDefault(x => x.StudentID == isValidate.StudentId)
-                        ?.Classes.ClassName;
+                                         _db.Students.FirstOrDefault(x => x.ID == isValidate.StudentId)?.Picture ?? _db.Users.FirstOrDefault(x => x.Username == us.Username)?.Picture;
+                    Session["className"] = _db.ClassStudents.FirstOrDefault(x => x.StudentID == isValidate.StudentId)?.Classes.ClassName;
                     return Json("yes");
                 }
             }
@@ -385,7 +384,8 @@ namespace OBS.Controllers
                         CreatedDate = user.CreatedDate,
                         Password = user.Password,
                         StudentId = user.StudentId,
-                        TeacherId = user.TeacherId
+                        TeacherId = user.TeacherId,
+                        Picture = us.Picture ?? user.Picture
                     };
 
                     _db.Set<Users>().AddOrUpdate(data);

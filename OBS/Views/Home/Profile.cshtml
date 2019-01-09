@@ -31,8 +31,8 @@
                             if (std != null)
                             {
                                 <div class="form-group">
-                                    <label>Resminiz</label>
-                                    <img src="/Uploads/@std.Picture" class="card-img-actions-overlay card-img" />
+                                    <label>Resminiz</label><br>
+                                    <img src="/Uploads/@std.Picture" class="img-rounded" witdh="150px" height="150px" />
                                 </div>
 
                                 if (stdId != null)
@@ -96,8 +96,8 @@
                             if (tch != null)
                             {
                                 <div class="form-group">
-                                    <label>Resminiz</label>
-                                    <img src="/Uploads/@tch.Picture" class="card-img-actions-overlay card-img" />
+                                    <label>Resminiz</label><br>
+                                    <img src="/Uploads/@tch.Picture" class="img-rounded" witdh="150px" height="150px" />
                                 </div>
 
                                 if (tchId != null)
@@ -141,12 +141,20 @@
                             var userId = Convert.ToInt32(Session["userId"]);
                             var user = _db.Users.FirstOrDefault(x => x.ID == userId);
                             <div class="form-group">
-                                <label>Resminiz</label>
-                                <img src="/Uploads/@Session["picture"]" class="card-img-actions-overlay card-img" />
+                                <label>Resminiz</label><br>
+                                <img src="/Uploads/@Session["picture"]" class="img-rounded" witdh="150px" height="150px" />
                             </div>
+
 
                             if (user != null)
                             {
+                                <div class="form-group row">
+                                    <div class="col-md-12">
+                                        <label>Yeni Resminizi seçin:</label>
+                                        <input type="file" id="Picture" />
+                                        <input type="text" hidden="pictures" value="@Session["picture"]" />
+                                    </div>
+                                </div>
                                 <div class="form-group row">
                                     <div class="col-md-6">
                                         <label>Kullanıcı Adınız</label>
@@ -189,7 +197,7 @@
 
             $("form").submit(function (e) {
                 e.preventDefault();
-           
+
 
                 formKontrol();
 
@@ -210,23 +218,31 @@
                         buttons: [
                             ['<button><b>Şifreyi Doğrula</b></button>', function (instance, toast, button, e, inputs) {
 
+                                $.imageUpload.Post("#Picture");
+                                var filename = "";
+                                if ($("#Picture").val().length > 0) {
 
-
+                                    var fileInput = document.getElementById('Picture');
+                                    filename = fileInput.files[0].name;
+                                } else {
+                                    filename = $("#pictures").val();
+                                }
                                 var data = new Object();
                                 data.ID = $("#ID").val();
                                 data.Username = $("#username").val();
                                 data.Email = $("#email").val();
+                                data.Picture = filename;
                                 $.ajax({
                                     type: "POST",
                                     url: "/user/profile/change",
-                                    data: JSON.stringify({ us: data, password: inputs[0].value}),
+                                    data: JSON.stringify({ us: data, password: inputs[0].value }),
                                     contentType: "application/json; charset=utf-8",
                                     dataType: "json",
                                     success: function (response) {
                                         if (response === "Update") {
                                             $.iziToast.Success();
                                             $.iziToast.Info("Bilgileriniz değiştirilmiştir.");
-                                            setTimeout(function(){ location.reload(); }, 3000);
+                                            setTimeout(function () { location.reload(); }, 3000);
                                         } else if (response === "NoChanges") {
                                             $.iziToast.Info("Herhangi bir değişiklik yapmadınız.");
                                         } else if (response === "Incorrect") {

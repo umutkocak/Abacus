@@ -120,6 +120,7 @@
           <Property Name="Password" Type="nvarchar" MaxLength="50" />
           <Property Name="Email" Type="nvarchar" MaxLength="150" />
           <Property Name="CreatedDate" Type="date" />
+          <Property Name="Picture" Type="nvarchar(max)" />
         </EntityType>
         <Association Name="FK_Announcements_Classes">
           <End Role="Classes" Type="Self.Classes" Multiplicity="0..1">
@@ -451,6 +452,7 @@
           <Property Name="CreatedDate" Type="DateTime" Precision="0" />
           <NavigationProperty Name="Students" Relationship="OBSModel.FK_Users_Students" FromRole="Users" ToRole="Students" />
           <NavigationProperty Name="Teachers" Relationship="OBSModel.FK_Users_Teachers" FromRole="Users" ToRole="Teachers" />
+          <Property Name="Picture" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         <Association Name="FK_ClassLessons_Classes">
           <End Role="Classes" Type="Self.Classes" Multiplicity="0..1">
@@ -845,6 +847,7 @@
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="OBSModel.Users">
               <MappingFragment StoreEntitySet="Users">
+                <ScalarProperty Name="Picture" ColumnName="Picture" />
                 <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="TeacherId" ColumnName="TeacherId" />
