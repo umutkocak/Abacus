@@ -57,6 +57,21 @@
           <Property Name="CreatedDate" Type="datetime" />
           <Property Name="ModifiedDate" Type="datetime" />
         </EntityType>
+        <EntityType Name="HomeWork">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" MaxLength="50" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="ClassId" Type="int" />
+          <Property Name="LessonId" Type="int" />
+          <Property Name="StartTime" Type="date" />
+          <Property Name="EndTime" Type="date" />
+          <Property Name="FileName" Type="nvarchar" MaxLength="250" />
+          <Property Name="CreatedBy" Type="int" />
+          <Property Name="CreatedDate" Type="date" />
+        </EntityType>
         <EntityType Name="Lesson">
           <Key>
             <PropertyRef Name="ID" />
@@ -121,6 +136,8 @@
           <Property Name="Email" Type="nvarchar" MaxLength="150" />
           <Property Name="CreatedDate" Type="date" />
           <Property Name="Picture" Type="nvarchar(max)" />
+          <Property Name="Parent" Type="nvarchar" MaxLength="50" />
+          <Property Name="ParentNumber" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <Association Name="FK_Announcements_Classes">
           <End Role="Classes" Type="Self.Classes" Multiplicity="0..1">
@@ -306,6 +323,7 @@
           <EntitySet Name="ClassLessons" EntityType="Self.ClassLessons" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ClassSchedule" EntityType="Self.ClassSchedule" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ClassStudents" EntityType="Self.ClassStudents" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="HomeWork" EntityType="Self.HomeWork" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Lesson" EntityType="Self.Lesson" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Notes" EntityType="Self.Notes" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Professions" EntityType="Self.Professions" Schema="dbo" store:Type="Tables" />
@@ -453,6 +471,8 @@
           <NavigationProperty Name="Students" Relationship="OBSModel.FK_Users_Students" FromRole="Users" ToRole="Students" />
           <NavigationProperty Name="Teachers" Relationship="OBSModel.FK_Users_Teachers" FromRole="Users" ToRole="Teachers" />
           <Property Name="Picture" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Parent" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ParentNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <Association Name="FK_ClassLessons_Classes">
           <End Role="Classes" Type="Self.Classes" Multiplicity="0..1">
@@ -578,6 +598,7 @@
             <End Role="Students" EntitySet="Students" />
             <End Role="Announcements" EntitySet="Announcements" />
           </AssociationSet>
+          <EntitySet Name="HomeWork" EntityType="OBSModel.HomeWork" />
           </EntityContainer>
         <EntityType Name="Students">
           <Key>
@@ -777,6 +798,21 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="HomeWork">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Title" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ClassId" Type="Int32" />
+          <Property Name="LessonId" Type="Int32" />
+          <Property Name="StartTime" Type="DateTime" Precision="0" />
+          <Property Name="EndTime" Type="DateTime" Precision="0" />
+          <Property Name="FileName" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedBy" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="0" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -847,6 +883,8 @@
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="OBSModel.Users">
               <MappingFragment StoreEntitySet="Users">
+                <ScalarProperty Name="ParentNumber" ColumnName="ParentNumber" />
+                <ScalarProperty Name="Parent" ColumnName="Parent" />
                 <ScalarProperty Name="Picture" ColumnName="Picture" />
                 <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
@@ -905,6 +943,22 @@
                 <ScalarProperty Name="StudentId" ColumnName="StudentId" />
                 <ScalarProperty Name="Date" ColumnName="Date" />
                 <ScalarProperty Name="AllUser" ColumnName="AllUser" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="HomeWork">
+            <EntityTypeMapping TypeName="OBSModel.HomeWork">
+              <MappingFragment StoreEntitySet="HomeWork">
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="FileName" ColumnName="FileName" />
+                <ScalarProperty Name="EndTime" ColumnName="EndTime" />
+                <ScalarProperty Name="StartTime" ColumnName="StartTime" />
+                <ScalarProperty Name="LessonId" ColumnName="LessonId" />
+                <ScalarProperty Name="ClassId" ColumnName="ClassId" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
                 <ScalarProperty Name="Title" ColumnName="Title" />
                 <ScalarProperty Name="ID" ColumnName="ID" />

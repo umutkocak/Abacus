@@ -68,6 +68,33 @@ $.imageUpload = {
     }
 };
 
+$.fileUpload = {
+    Post: function (id) {
+        if ($(id).val().length > 0) {
+            var fileUpload = $(id).get(0);
+            var files = fileUpload.files;
+            var fileData = new FormData();
+            for (var i = 0; i < files.length; i++) {
+                fileData.append(files[i].name, files[i]);
+            }
+            // Adding one more key to FormData object
+            fileData.append('username', 'Manas');
+            $.ajax({
+                url: '/upload/image',
+                type: "POST",
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                data: fileData,
+                success: function (result) {
+                },
+                error: function (err) {
+                    alert(err.statusText);
+                }
+            });
+        }
+    }
+};
+
 $.iziToast = {
     Success: function() {
         iziToast.success({

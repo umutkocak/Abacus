@@ -101,7 +101,6 @@ namespace OBS.Controllers
             return View();
         }
 
-
         [Route("announcement")]
         public ActionResult Announcement()
         {
@@ -116,6 +115,12 @@ namespace OBS.Controllers
 
         [Route("user/profile")]
         public ActionResult Profile()
+        {
+            return View();
+        }
+
+        [Route("homework")]
+        public ActionResult HomeWork()
         {
             return View();
         }
@@ -204,7 +209,7 @@ namespace OBS.Controllers
                                                   _db.Students.FirstOrDefault(x => x.ID == std.StudentId)?.FullName ??
                                                   std.Username;
                             Session["picture"] = _db.Teachers.FirstOrDefault(x => x.ID == std.TeacherId)?.Picture ??
-                                                  _db.Students.FirstOrDefault(x => x.ID == std.StudentId)?.Picture ?? _db.Users.FirstOrDefault(x=> x.Username == us.Username)?.Picture;
+                                                  _db.Students.FirstOrDefault(x => x.ID == std.StudentId)?.Picture ?? _db.Users.FirstOrDefault(x => x.Username == us.Username)?.Picture;
                             return Json("yes");
                         }
                         else
@@ -425,7 +430,7 @@ namespace OBS.Controllers
             }
             return Json(new { data = dataList }, JsonRequestBehavior.AllowGet);
         }
-        
+
         [Route("users/details/{id?}"), HttpGet]
         public JsonResult UsersDetails(int? id)
         {
@@ -1167,6 +1172,119 @@ namespace OBS.Controllers
 
         #endregion
 
+        #region Home Work
+
+        [Route("homework/add"), HttpPost]
+        public JsonResult HomeWorkAdd(HomeWork home)
+        {
+            if (ModelState.IsValid)
+            {
+
+                if (home.ID > 0)
+                {
+                    var oldData = _db.HomeWork.FirstOrDefault(x => x.ID == home.ID);
+                    var data = new HomeWork
+                    {
+                        ID = home.ID,
+                        ClassId = home.ClassId,
+                        Description = home.Description,
+                        EndTime = home.EndTime,
+                        StartTime = home.StartTime,
+                        FileName = home.FileName,
+                        LessonId = home.LessonId,
+                        Title = home.Title,
+                        CreatedBy = oldData.CreatedBy,
+                        CreatedDate = oldData.CreatedDate
+                    };
+                    _db.Set<HomeWork>().AddOrUpdate(data);
+                    return Json(_db.SaveChanges() > 0 ? "Update" : "NoChanges");
+                }
+                else
+                {
+                    var userId = Convert.ToInt32(Session["userId"]);
+                    var data = new HomeWork
+                    {
+                        ClassId = home.ClassId,
+                        Description = home.Description,
+                        EndTime = home.EndTime,
+                        StartTime = home.StartTime,
+                        FileName = home.FileName,
+                        LessonId = home.LessonId,
+                        Title = home.Title,
+                        CreatedBy = userId,
+                        CreatedDate = DateTime.Now
+                    };
+                    _db.HomeWork.Add(data);
+                    return Json(_db.SaveChanges() > 0 ? "Success" : "NoChanges");
+                }
+            }
+            return Json(home, JsonRequestBehavior.AllowGet);
+        }
+
+        [Route("json/homework")]
+        public JsonResult HomeWorkList()
+        {
+            var list = _db.HomeWork.ToList();
+            var data = new List<HomeWorkViewModel>();
+            foreach (var i in list)
+            {
+                var createdById = _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.TeacherId ??
+                                  _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID;
+                data.Add(new HomeWorkViewModel
+                {
+                    ID = i.ID,
+                    ClassId = i.ClassId,
+                    ClassName = _db.Classes.FirstOrDefault(x => x.ID == i.ClassId)?.ClassName,
+                    LessonName = _db.Lesson.FirstOrDefault(x => x.ID == i.LessonId)?.LessonName,
+                    CreatedBy = _db.Teachers.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID,
+                    CreatedByName = _db.Teachers.FirstOrDefault(x => x.ID == createdById)?.FullName ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.Username,
+                    CreatedDate = i.CreatedDate,
+                    LessonId = i.LessonId,
+                    Description = i.Description,
+                    Title = i.Title,
+                    StartTime = i.StartTime,
+                    EndTime = i.EndTime,
+                    FileName = i.FileName
+                });
+            }
+            return Json(new { data = data }, JsonRequestBehavior.AllowGet);
+        }
+
+        [Route("json/homework/{id?}")]
+        public JsonResult HomeWorkList(int? id)
+        {
+            _db.Configuration.LazyLoadingEnabled = false;
+
+
+            var list = _db.HomeWork.Where(x => x.CreatedBy == id).ToList();
+
+            var data = new List<HomeWorkViewModel>();
+            foreach (var i in list)
+            {
+                var createdById = _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.TeacherId ??
+                                  _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID;
+                data.Add(new HomeWorkViewModel
+                {
+                    ID = i.ID,
+                    ClassId = i.ClassId,
+                    ClassName = _db.Classes.FirstOrDefault(x=> x.ID == i.ClassId)?.ClassName,
+                    LessonName = _db.Lesson.FirstOrDefault(x=> x.ID == i.LessonId)?.LessonName,
+                    CreatedBy = id,
+                    CreatedByName = _db.Teachers.FirstOrDefault(x => x.ID == createdById)?.FullName ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.Username,
+                    CreatedDate = i.CreatedDate,
+                    LessonId = i.LessonId,
+                    Description = i.Description,
+                    Title = i.Title,
+                    StartTime = i.StartTime,
+                    EndTime = i.EndTime,
+                    FileName = i.FileName
+                });
+            }
+            return Json(new { data = data }, JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion
+
         #region Announcement
 
         [Route("announcement/add"), HttpPost]
@@ -1221,7 +1339,7 @@ namespace OBS.Controllers
         public JsonResult AnnouncementDetail(int? id)
         {
             var data = new List<AnnouncementListViewModel>();
-            var dataList = _db.Announcements.Where(x=> x.ID == id).ToList();
+            var dataList = _db.Announcements.Where(x => x.ID == id).ToList();
 
             foreach (var i in dataList)
             {
@@ -1243,7 +1361,7 @@ namespace OBS.Controllers
                 });
             }
 
-            return Json(new {data = data}, JsonRequestBehavior.AllowGet);
+            return Json(new { data = data }, JsonRequestBehavior.AllowGet);
         }
 
         [Route("announcement/delete/{id?}")]
@@ -1312,7 +1430,7 @@ namespace OBS.Controllers
             else if (tchId != null)
             {
                 var datalist = _db.Announcements.Where(x => x.CreatedBy == id).ToList();
-                foreach (var i in datalist.OrderByDescending(x=> x.Date))
+                foreach (var i in datalist.OrderByDescending(x => x.Date))
                 {
                     var teacherId = _db.Users.FirstOrDefault(x => x.TeacherId == i.CreatedBy)?.TeacherId;
 

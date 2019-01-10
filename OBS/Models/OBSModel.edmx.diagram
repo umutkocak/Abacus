@@ -30,6 +30,7 @@
         <AssociationConnector Association="OBSModel.FK_Announcements_Classes" />
         <AssociationConnector Association="OBSModel.FK_Announcements_Lesson" />
         <AssociationConnector Association="OBSModel.FK_Announcements_Students" />
+        <EntityTypeShape EntityType="OBSModel.HomeWork" Width="1.5" PointX="3.375" PointY="0.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

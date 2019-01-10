@@ -94,7 +94,7 @@
                             {
                                 @Html.Label("Öğretmen")
                             }
-                            else
+                            else if(status == "Student")
                             {
                                 @Html.Label("Sınıfı: ")
                                 @Session["className"].ToString();

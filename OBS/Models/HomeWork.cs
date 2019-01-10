@@ -15,22 +15,28 @@ namespace OBS.Models
 using System;
     using System.Collections.Generic;
     
-public partial class ClassSchedule
+public partial class HomeWork
 {
 
     public int ID { get; set; }
+
+    public string Title { get; set; }
+
+    public string Description { get; set; }
 
     public Nullable<int> ClassId { get; set; }
 
     public Nullable<int> LessonId { get; set; }
 
-    public string Day { get; set; }
+    public Nullable<System.DateTime> StartTime { get; set; }
 
-    public string StartTime { get; set; }
+    public Nullable<System.DateTime> EndTime { get; set; }
 
-    public string EndTime { get; set; }
+    public string FileName { get; set; }
 
-    public string Color { get; set; }
+    public Nullable<int> CreatedBy { get; set; }
+
+    public Nullable<System.DateTime> CreatedDate { get; set; }
 
 }
 
