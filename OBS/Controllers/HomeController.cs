@@ -125,9 +125,35 @@ namespace OBS.Controllers
             return View();
         }
 
+        [Route("appointment")]
+        public ActionResult Appointment()
+        {
+            return View();
+        }
+
         #endregion
 
         #region JsonResults
+
+        #region Statistics
+
+        [Route("statistics")]
+        public JsonResult Statistics()
+        {
+            var data = new StatisticsViewModel
+            {
+                AnnouncementCount = _db.Announcements.Count(),
+                ClassCount = _db.Classes.Count(),
+                HomeWorkCount = _db.HomeWork.Count(),
+                LessonCount = _db.Lesson.Count(),
+                StudentCount = _db.Students.Count(),
+                TeacherCount = _db.Teachers.Count()
+            };
+
+            return Json(new {data}, JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion
 
         #region Image Upload
 
@@ -910,7 +936,7 @@ namespace OBS.Controllers
                     data.Add(addClass);
                 }
             }
-            
+
             return Json(new { data = data }, JsonRequestBehavior.AllowGet);
         }
 
@@ -1369,7 +1395,7 @@ namespace OBS.Controllers
 
             var data = new List<HomeWorkViewModel>();
 
-         
+
             if (i != null)
             {
                 var createdById = _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.TeacherId ??
@@ -1408,7 +1434,7 @@ namespace OBS.Controllers
         }
 
 
-       
+
         #endregion
 
         #region Announcement

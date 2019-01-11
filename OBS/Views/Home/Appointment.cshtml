@@ -1,0 +1,90 @@
+﻿@{
+    ViewBag.Title = "Randevu - ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row" ng-app="">
+    <div class="col-md-12">
+
+        <div class="card">
+            <div class="card-header header-elements-inline">
+                <h5 class="card-title">Randevular</h5>
+            </div>
+            @if (Session["roleName"].ToString() != "Student")
+            {
+
+                <div class="card-body">
+                    <p><button id="add" type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"><i class="icon-plus2"></i>Yeni Randevu İsteği</button></p>
+                </div>
+
+                <div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="true" style="z-index: 1050; display: none;" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Yeni Randevu İsteği</h5>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <form id="form">
+                                <div class="modal-body">
+
+                                    <input type="text" id="ID" hidden="" class="form-control">
+                                    <input type="text" id="StudentId" hidden="" value="@Session["userId"]" class="form-control">
+
+                                    <div class="form-group">
+                                        <label>Öğretmen</label>
+                                        <select id="TeacherId" class="form-control select-fixed-single" disabled="disabled"></select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Mesajınız</label>
+                                        <textarea id="summernote" name="editordata"></textarea>
+                                    </div>
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                                    <button type="submit" class="btn btn-primary">Kaydet <i class="icon-database-check ml-2"></i></button>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Vertical form modal -->
+            <!-- /vertical form modal -->
+
+            <table id="examples" class="table" style="width: 100%"></table>
+
+
+
+        </div>
+
+
+
+    </div>
+
+</div>
+
+
+@section scripts{
+    @*$(elem).prop('selectedIndex', 1).change();*@
+    <script>
+
+        $(document).ready(function() {
+            $('#myModal').on('shown.bs.modal',
+                function() {
+                    $('#summernote').summernote({
+                        tabsize: 2,
+                        height: 100,
+                        lang: 'tr-TR',
+                        toolbar: [
+                            ['style', ['bold', 'italic', 'underline', 'clear']],
+                            ['color', ['color']]
+                        ]
+                    });
+                });
+        });
+    </script>
+}

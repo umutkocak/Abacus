@@ -18,9 +18,18 @@
     <div class="col-md-12">
 
         <div class="card">
-            <div class="card-header header-elements-inline">
-                <h5 class="card-title">Sınıflar ve Öğrenciler</h5>
-            </div>
+            @if (Session["roleName"].ToString() == "Admin")
+            {
+                <div class="card-header header-elements-inline">
+                    <h5 class="card-title">Sınıflar ve Öğrenciler</h5>
+                </div>
+            }
+            else
+            {
+                <div class="card-header header-elements-inline">
+                    <h5 class="card-title">Öğrenciler</h5>
+                </div>
+            }
 
             <table id="examples" class="table table-bordered table-hover datatable-highlight dataTable no-footer" style="width: 100%"></table>
 
