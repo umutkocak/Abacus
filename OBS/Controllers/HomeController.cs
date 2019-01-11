@@ -821,49 +821,96 @@ namespace OBS.Controllers
 
         #region Class
 
-        [Route("json/class"), HttpGet]
-        public JsonResult ClassList()
+        [Route("json/class/{id?}"), HttpGet]
+        public JsonResult ClassList(int? id)
         {
             _db.Configuration.LazyLoadingEnabled = false;
             var data = new List<ClassViewModel>();
-            var dataList = _db.Classes.OrderBy(x => x.ID).ToList();
-            foreach (var item in dataList)
-            {
-                var lessonFind = _db.ClassLessons.OrderBy(x => x.ID).Where(x => x.ClassID == item.ID).ToList();
-                var stdFind = _db.ClassStudents.OrderBy(x => x.ID).Where(x => x.ClassId == item.ID).ToList();
-                var addClass = new ClassViewModel
-                {
-                    ID = item.ID,
-                    ClassName = item.ClassName,
-                    Teacher = _db.Teachers.FirstOrDefault(x => x.ID == item.TeacherID)?.FullName
-                };
 
-                var lessonList = new List<LessonsViewModel>();
-                foreach (var i in lessonFind)
+            if (id <= 0 || id == null)
+            {
+                var dataList = _db.Classes.OrderBy(x => x.ID).ToList();
+                foreach (var item in dataList)
                 {
-                    lessonList.Add(new LessonsViewModel
+                    var lessonFind = _db.ClassLessons.OrderBy(x => x.ID).Where(x => x.ClassID == item.ID).ToList();
+                    var stdFind = _db.ClassStudents.OrderBy(x => x.ID).Where(x => x.ClassId == item.ID).ToList();
+                    var addClass = new ClassViewModel
                     {
-                        ID = i.ID,
-                        LessonName = _db.Lesson.FirstOrDefault(x => x.ID == i.LessonID)?.LessonName
-                    });
-                }
-                var stdList = new List<StudentsViewModel>();
-                foreach (var j in stdFind)
-                {
-                    stdList.Add(new StudentsViewModel
+                        ID = item.ID,
+                        ClassName = item.ClassName,
+                        Teacher = _db.Teachers.FirstOrDefault(x => x.ID == item.TeacherID)?.FullName
+                    };
+
+                    var lessonList = new List<LessonsViewModel>();
+                    foreach (var i in lessonFind)
                     {
-                        ID = j.ID,
-                        TCNumber = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.TCNumber,
-                        StudentNumber = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.StudentNumber,
-                        FullName = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.FullName,
-                        Birthday = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Birthday,
-                        Image = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Picture
-                    });
+                        lessonList.Add(new LessonsViewModel
+                        {
+                            ID = i.ID,
+                            LessonName = _db.Lesson.FirstOrDefault(x => x.ID == i.LessonID)?.LessonName
+                        });
+                    }
+                    var stdList = new List<StudentsViewModel>();
+                    foreach (var j in stdFind)
+                    {
+                        stdList.Add(new StudentsViewModel
+                        {
+                            ID = j.ID,
+                            TCNumber = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.TCNumber,
+                            StudentNumber = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.StudentNumber,
+                            FullName = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.FullName,
+                            Birthday = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Birthday,
+                            Image = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Picture
+                        });
+                    }
+                    addClass.Lessons = lessonList;
+                    addClass.Students = stdList;
+                    data.Add(addClass);
                 }
-                addClass.Lessons = lessonList;
-                addClass.Students = stdList;
-                data.Add(addClass);
             }
+            else
+            {
+                var tchId = _db.Users.FirstOrDefault(x => x.ID == id)?.TeacherId;
+                var dataList = _db.Classes.Where(x => x.TeacherID == tchId).ToList();
+                foreach (var item in dataList)
+                {
+                    var lessonFind = _db.ClassLessons.OrderBy(x => x.ID).Where(x => x.ClassID == item.ID).ToList();
+                    var stdFind = _db.ClassStudents.OrderBy(x => x.ID).Where(x => x.ClassId == item.ID).ToList();
+                    var addClass = new ClassViewModel
+                    {
+                        ID = item.ID,
+                        ClassName = item.ClassName,
+                        Teacher = _db.Teachers.FirstOrDefault(x => x.ID == item.TeacherID)?.FullName
+                    };
+
+                    var lessonList = new List<LessonsViewModel>();
+                    foreach (var i in lessonFind)
+                    {
+                        lessonList.Add(new LessonsViewModel
+                        {
+                            ID = i.ID,
+                            LessonName = _db.Lesson.FirstOrDefault(x => x.ID == i.LessonID)?.LessonName
+                        });
+                    }
+                    var stdList = new List<StudentsViewModel>();
+                    foreach (var j in stdFind)
+                    {
+                        stdList.Add(new StudentsViewModel
+                        {
+                            ID = j.ID,
+                            TCNumber = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.TCNumber,
+                            StudentNumber = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.StudentNumber,
+                            FullName = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.FullName,
+                            Birthday = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Birthday,
+                            Image = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Picture
+                        });
+                    }
+                    addClass.Lessons = lessonList;
+                    addClass.Students = stdList;
+                    data.Add(addClass);
+                }
+            }
+            
             return Json(new { data = data }, JsonRequestBehavior.AllowGet);
         }
 
@@ -1255,11 +1302,75 @@ namespace OBS.Controllers
         {
             _db.Configuration.LazyLoadingEnabled = false;
 
+            var data = new List<HomeWorkViewModel>();
 
             var list = _db.HomeWork.Where(x => x.CreatedBy == id).ToList();
+            if (list.Count <= 0)
+            {
+                var stdId = _db.Users.FirstOrDefault(x => x.ID == id)?.StudentId;
+                var userClass = _db.ClassStudents.FirstOrDefault(x => x.StudentID == stdId)?.ClassId;
+                var userWorkList = _db.HomeWork.Where(x => x.ClassId == userClass).ToList();
+                foreach (var i in userWorkList)
+                {
+                    var createdById = _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.TeacherId ??
+                                      _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID;
+                    data.Add(new HomeWorkViewModel
+                    {
+                        ID = i.ID,
+                        ClassId = i.ClassId,
+                        ClassName = _db.Classes.FirstOrDefault(x => x.ID == i.ClassId)?.ClassName,
+                        LessonName = _db.Lesson.FirstOrDefault(x => x.ID == i.LessonId)?.LessonName,
+                        CreatedBy = id,
+                        CreatedByName = _db.Teachers.FirstOrDefault(x => x.ID == createdById)?.FullName ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.Username,
+                        CreatedDate = i.CreatedDate,
+                        LessonId = i.LessonId,
+                        Description = i.Description,
+                        Title = i.Title,
+                        StartTime = i.StartTime,
+                        EndTime = i.EndTime,
+                        FileName = i.FileName
+                    });
+                }
+            }
+            else
+            {
+                foreach (var i in list)
+                {
+                    var createdById = _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.TeacherId ??
+                                      _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID;
+                    data.Add(new HomeWorkViewModel
+                    {
+                        ID = i.ID,
+                        ClassId = i.ClassId,
+                        ClassName = _db.Classes.FirstOrDefault(x => x.ID == i.ClassId)?.ClassName,
+                        LessonName = _db.Lesson.FirstOrDefault(x => x.ID == i.LessonId)?.LessonName,
+                        CreatedBy = id,
+                        CreatedByName = _db.Teachers.FirstOrDefault(x => x.ID == createdById)?.FullName ??
+                                        _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.Username,
+                        CreatedDate = i.CreatedDate,
+                        LessonId = i.LessonId,
+                        Description = i.Description,
+                        Title = i.Title,
+                        StartTime = i.StartTime,
+                        EndTime = i.EndTime,
+                        FileName = i.FileName
+                    });
+                }
+            }
+
+            return Json(new { data = data }, JsonRequestBehavior.AllowGet);
+        }
+
+        [Route("json/homework/details/{id?}")]
+        public JsonResult HomeWorkDetails(int? id)
+        {
+            _db.Configuration.LazyLoadingEnabled = false;
+            var i = _db.HomeWork.FirstOrDefault(x => x.ID == id);
 
             var data = new List<HomeWorkViewModel>();
-            foreach (var i in list)
+
+         
+            if (i != null)
             {
                 var createdById = _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.TeacherId ??
                                   _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID;
@@ -1267,10 +1378,11 @@ namespace OBS.Controllers
                 {
                     ID = i.ID,
                     ClassId = i.ClassId,
-                    ClassName = _db.Classes.FirstOrDefault(x=> x.ID == i.ClassId)?.ClassName,
-                    LessonName = _db.Lesson.FirstOrDefault(x=> x.ID == i.LessonId)?.LessonName,
+                    ClassName = _db.Classes.FirstOrDefault(x => x.ID == i.ClassId)?.ClassName,
+                    LessonName = _db.Lesson.FirstOrDefault(x => x.ID == i.LessonId)?.LessonName,
                     CreatedBy = id,
-                    CreatedByName = _db.Teachers.FirstOrDefault(x => x.ID == createdById)?.FullName ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.Username,
+                    CreatedByName = _db.Teachers.FirstOrDefault(x => x.ID == createdById)?.FullName ??
+                                    _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.Username,
                     CreatedDate = i.CreatedDate,
                     LessonId = i.LessonId,
                     Description = i.Description,
@@ -1283,6 +1395,20 @@ namespace OBS.Controllers
             return Json(new { data = data }, JsonRequestBehavior.AllowGet);
         }
 
+        [Route("homework/delete/{id?}")]
+        [HttpPost]
+        public JsonResult HomeWorkDelete(int id)
+        {
+            var homework = _db.HomeWork.ToList().Find(x => x.ID == id);
+            if (homework != null)
+            {
+                _db.HomeWork.Remove(homework);
+            }
+            return Json(_db.SaveChanges() > 0 ? "Success" : "Error");
+        }
+
+
+       
         #endregion
 
         #region Announcement

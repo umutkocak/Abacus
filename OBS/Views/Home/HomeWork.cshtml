@@ -30,11 +30,7 @@
                     <div class="card-header">
                         @if (Session["roleName"].ToString() == "Student")
                         {
-                            <button id="allDisplay" type="button" class="btn btn-primary mt-1">  <span class="badge bg-grey-800 badge-pill" id="allCount"></span>&nbsp; <i class="icon-megaphone"></i>&nbsp; Hepsini Göster</button>
-
-                            <button id="allClass" type="button" class="btn btn-success pull-right mt-1">  <span class="badge bg-grey-800 badge-pill" id="classCount"></span> &nbsp; Sınıf &nbsp;  <i class="icon-pencil6"></i> </button>
-                            <button id="allLesson" type="button" class="btn btn-default bg-indigo mt-1 pull-right"> <span class="badge bg-grey-800 badge-pill" id="lessonCount"></span> &nbsp; Ders &nbsp;  <i class="icon-books"></i> </button>
-                            <button id="allStudent" type="button" class="btn btn-default bg-brown-400 mt-1"> <span class="badge bg-grey-800 badge-pill" id="studentCount"></span> &nbsp; Bana Özel &nbsp;  <i class="icon-user"></i> </button>
+                            <button id="allDisplay" type="button" class="btn btn-primary mt-1"> <i class="icon-pencil6"></i>&nbsp; Toplam Ödev Sayısı <span class="badge bg-grey-800 badge-pill" id="allCount"></span>&nbsp; </button>
                         }
                         @if (Session["roleName"].ToString() == "Teacher")
                         {
@@ -145,70 +141,93 @@ else
         </div>
     </div>
 }
+@if (Session["roleName"].ToString() == "Teacher" || Session["roleName"].ToString() == "Admin")
+{
+    <!-- Vertical form modal -->
+    <div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="true" style="z-index: 1050; display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Ödev Ekle</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <form id="form">
+                    <div class="modal-body">
 
-<!-- Vertical form modal -->
-<div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="true" style="z-index: 1050; display: none;" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Yeni Ödev Ekle</h5>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+
+                        <ul class="nav nav-tabs nav-tabs-highlight nav-justified">
+                            <li class="nav-item"><a href="#highlighted-justified-tab1" class="nav-link active show" data-toggle="tab">Ödev Bilgileri</a></li>
+                            <li class="nav-item"><a href="#highlighted-justified-tab2" class="nav-link" data-toggle="tab">Dökümanlar</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="tab-pane fade active show" id="highlighted-justified-tab1">
+                                <input type="text" id="ID" hidden="" class="form-control">
+                                <div class="form-group">
+                                    <label>Ödev Başlığı</label>
+                                    <input type="text" id="title" class="form-control" placeholder="Başlık" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Ödev İçeriği</label>
+                                    <textarea id="summernote" name="editordata"></textarea>
+                                </div>
+
+                                <div id="checkSinif" class="form-group row">
+                                    <div class="col-md-6">
+                                        <div id="sinifSelect2">
+                                            <label>Sınıfı Seç</label>
+                                            <select id="ClassId" class="form-control select-fixed-single"></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div id="dersSelect2">
+                                            <label>Dersi Seç</label>
+                                            <select id="LessonId" class="form-control select-fixed-single"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-6">
+                                        <label>Başlangıç Tarihi</label>
+                                        <input type="date" id="StartTime" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Bitiş Tarihi</label>
+                                        <input type="date" id="EndTime" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="highlighted-justified-tab2">
+                                <div class="form-group row">
+                                    <div class="col-md-12">
+                                        <label>Ödev dökümanı:</label>
+                                        <input type="file" id="Picture" />
+                                        <input type="text" hidden id="pictures" class="form-control">
+                                    </div>
+                                    <div class="col-md-12 mt-3" id="attachment">
+
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                        <button type="submit" class="btn btn-primary">Kaydet <i class="icon-database-check ml-2"></i></button>
+                    </div>
+                </form>
             </div>
-            <form id="form">
-                <div class="modal-body">
-                    <input type="text" id="ID" hidden="" class="form-control">
-                    <div class="form-group">
-                        <label>Ödev Başlığı</label>
-                        <input type="text" id="title" class="form-control" placeholder="Başlık" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Ödev İçeriği</label>
-                        <textarea id="summernote" name="editordata" required></textarea>
-                    </div>
-                    @if (Session["roleName"].ToString() == "Teacher" || Session["roleName"].ToString() == "Admin")
-                    {
-                        <div id="checkSinif" class="form-group row">
-                            <div class="col-md-6">
-                                <div id="sinifSelect2">
-                                    <label>Sınıfı Seç</label>
-                                    <select id="ClassId" class="form-control select-fixed-single"></select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div id="dersSelect2">
-                                    <label>Dersi Seç</label>
-                                    <select id="LessonId" class="form-control select-fixed-single"></select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-md-6">
-                                <label>Başlangıç Tarihi</label>
-                                <input type="date" id="StartTime" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label>Bitiş Tarihi</label>
-                                <input type="date" id="EndTime" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-md-12">
-                                <label>Ödev dökümanı:</label>
-                                <input type="file" id="Picture" />
-                                <input type="text" hidden id="pictures" class="form-control">
-                            </div>
-                        </div>
-                    }
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
-                    <button type="submit" class="btn btn-primary">Kaydet <i class="icon-database-check ml-2"></i></button>
-                </div>
-            </form>
         </div>
     </div>
-</div>
+}
 <!-- /vertical form modal -->
 @section scripts{
 
@@ -220,127 +239,8 @@ else
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/lang/summernote-tr-TR.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            var role = "@Session["roleName"].ToString()";
-            if (role === "Admin") {
-                function getAnnouncement() { }
-            }
-
-            $('#myModal').on('shown.bs.modal',
-                function() {
-                    $('#summernote').summernote({
-                        tabsize: 2,
-                        height: 50,
-                        lang: 'tr-TR',
-                        toolbar: [
-                            ['style', ['bold', 'italic', 'underline', 'clear']],
-                            ['font', ['strikethrough', 'superscript', 'subscript']],
-                            ['fontsize', ['fontsize']],
-                            ['color', ['color']],
-                            ['para', ['ul', 'ol', 'paragraph']],
-                            ['height', ['height']]
-                        ]
-                    });
-                });
-
-            function formClear() {
-                $("#form")[0].reset();
-                $('#summernote').summernote('code', '');
-                $("#ClassId").val(null).trigger('change');
-                $("#LessonId").val(null).trigger('change');
-
-                $('[type="date"]').prop('min', function(){
-                    return new Date().toJSON().split('T')[0];
-                });
-                
-                //document.getElementById('StartTime').valueAsDate = new Date();
-
-            };
-
-            $("#add").click(function() {
-                formClear();
-            });
-
-            $.select2Ajax.VeriCek("#ClassId", "/json/select2/teachers/class/" + @Session["userId"]);
-
-            $('#ClassId').change('select2:selecting',
-                function(e) {
-                    $.select2Ajax.VeriCek("#LessonId", "/json/select2/class/" + $("#ClassId option:selected").val());
-                });
-
-            var isValidate = false;
-            function formKontrol() {
-                if ($("#StartTime").val() > $("#EndTime").val()) {
-                    isValidate = false;
-                    $.iziToast.Info("Başlangıç tarihi, bitiş tarihinden büyük olamaz.");
-                } else {
-                    isValidate = true;
-                }
-            }
-
-            $("form").submit(function(e) {
-                e.preventDefault();
-
-                formKontrol();
-
-                if (isValidate === true) {
-                    $.imageUpload.Post("#Picture");
-                    var data = new Object();
-
-                    var filename = "";
-                    if ($("#Picture").val().length > 0) {
-
-                        var fileInput = document.getElementById('Picture');
-                        filename = fileInput.files[0].name;
-                    } else {
-                        filename = $("#pictures").val();
-                    }
-                    if ($('#ID').val().length >= 1) {
-                        data.ID = $('#ID').val();
-                    }
-                    data.Title = $('#title').val();
-                    data.Description = $('#summernote').summernote('code');
-                    data.LessonId = $("#LessonId").val();
-                    data.ClassId = $("#ClassId").val();
-                    data.StartTime = $("#StartTime").val();
-                    data.EndTime = $("#EndTime").val();
-                    data.FileName = filename;
-                    $.ajax({
-                        type: "POST",
-                        url: "/homework/add",
-                        data: JSON.stringify(data),
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json",
-                        success: function (response) {
-                            if (response === "Success") {
-                                $.iziToast.Success();
-                                $("#examples").DataTable().ajax.reload();
-                                $("#myModal").modal('hide');
-                            } else if (response === "Update") {
-                                $.iziToast.Success();
-                                $("#examples").DataTable().ajax.reload();
-                                $("#myModal").modal('hide');
-                            } else if (response === "NoChanges") {
-                                $.iziToast.Info("Herhangi bir değişiklik yapılmadı.");
-                            } else {
-                                $.iziToast.Warning();
-                                alert(response);
-                            }
-                        },
-                        failure: function (response) {
-                            alert(response.responseText);
-                        },
-                        error: function (response) {
-                            alert(response.responseText);
-                        }
-                    });
-                }
-            });
 
 
-        });
-    </script>
 
     @if (Session["roleName"].ToString() == "Student")
     {
@@ -348,200 +248,393 @@ else
             $(document).ready(function() {
                 getAnnouncement();
 
-            function getAnnouncement() {
-                $("#duyurular").empty();
-                var announcement = '<div id="duyuruTipi" class="timeline-row">' +
-                    '<div class="timeline-icon">' +
-                    '<div class="arkaplanClass">' +
-                    '<i class="timelineIcon"></i>' +
-                    '</div>' +
-                    '</div>' +
-                    '' +
-                    '<div class="card">' +
-                    '<div class="card-header header-elements-sm-inline">' +
-                    '<h6 class="card-title">Baslik:</h6>' +
-                    '<div class="header-elements">' +
-                    '<span><i class="icon-database-time2 mr-2 text-success"></i>Tarih:</span>' +
-                    '</div>' +
-                    '</div>' +
-                    '' +
-                    '<div class="card-body">' +
-                    '<blockquote class="blockquote blockquote-bordered py-2 pl-3 mb-0">' +
-                    '<p class="mb-2 font-size-base">Aciklama:</p>' +
-                    '<footer class="blockquote-footer">Paylasan:</footer>' +
-                    '</blockquote>' +
-                    '</div>' +
-                    '<div class="card-footer d-sm-flex justify-content-sm-between align-items-sm-center">' +
-                    '<span>' +
-                    '<span class="badge badge-mark border-danger mr-2"></span>' +
-                    '<span class="font-weight-semibold">Tipi:</span>' +
-                    '</span>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>';
+                function getAnnouncement() {
+                    $("#duyurular").empty();
+                    var announcement = '<div id="duyuruTipi" class="timeline-row">' +
+                        '<div class="timeline-icon">' +
+                        '<div class="arkaplanClass">' +
+                        '<i class="timelineIcon"></i>' +
+                        '</div>' +
+                        '</div>' +
+                        '' +
+                        '<div class="card">' +
+                        '<div class="card-header header-elements-sm-inline">' +
+                        '<h6 class="card-title">Baslik:</h6>' +
+                        '<div class="header-elements">' +
+                        '</div>' +
+                        '</div>' +
+                        '' +
+                        '<div class="card-body m-3">' +
+                        '<p class="mb-2 font-size-base">Aciklama:</p>' +
+                        '<footer class="blockquote-footer">Paylasan:</footer>' +
+                        '</div>' +
+                        '<div class="card-footer d-sm-flex justify-content-sm-between align-items-sm-center">' +
+                        '<span>' +
+                        '<span class="badge badge-mark border-danger mr-2"></span>' +
+                        '<span class="font-weight-semibold">Tipi:</span>' +
+
+                        '<span><i class="icon-database-time2 ml-5 text-success"></i>  Başlangıç Tarihi: Tarih1</span>' +
+                        '<span><i class="icon-database-time2 ml-5 text-warning"></i>   Bitiş Tarihi: Tarih2</span>' +
+                        '</span>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
 
 
-                var list = [];
-                $('body').loading({
-                    stoppable: true,
-                    message: 'Duyurular yükleniyor...'
-                });
-                $.getJSON('/json/announcement/' + @Session["userId"],
-                    function(json) {
-                        $.each(json,
-                            function(i, value) {
-                                for (var j = 0; j < value.length; j++) {
-                                    var res;
-                                    if (value[j].AllUser === true) {
-                                        res = announcement.replace("Baslik:", value[j].Title);
-                                        res = res.replace("duyuruTipi", "announcementAll");
+                    var list = [];
+                    $('body').loading({
+                        stoppable: true,
+                        message: 'Ödevler yükleniyor...'
+                    });
+                    $.getJSON('/json/homework/' + @Session["userId"],
+                        function(json) {
+                            $.each(json,
+                                function(i, value) {
+                                    for (var j = 0; j < value.length; j++) {
+                                        var res;
+                                            res = announcement.replace("Baslik:", value[j].Title);
+                                            res = res.replace("duyuruTipi", "homework");
                                         res = res.replace("Aciklama:", value[j].Description);
-                                        res = res.replace("Tarih:",
-                                            new Date(parseInt(value[j].Date.substr(6))).format("dd.mm.yyyy  HH:MM"));
-                                        res = res.replace("Tipi:", "Genel Duyuru");
-                                        res = res.replace("Paylasan:", value[j].CreatedBy);
-                                        res = res.replace("arkaplanClass", "bg-warning-400");
-                                        res = res.replace("timelineIcon", "icon-megaphone");
-                                        list.push(res);
-                                    } else if (value[j].StudentId !== null) {
-                                        res = announcement.replace("Baslik:", value[j].Title);
-                                        res = res.replace("duyuruTipi", "announcementStudent");
-                                        res = res.replace("Aciklama:", value[j].Description);
-                                        res = res.replace("Tarih:",
-                                            new Date(parseInt(value[j].Date.substr(6))).format("dd.mm.yyyy  HH:MM"));
-                                        res = res.replace("Tipi:", "Öğrenci: " + value[j].Student);
-                                        res = res.replace("Paylasan:", value[j].CreatedBy);
-                                        res = res.replace("arkaplanClass", "bg-orange-400");
-                                        res = res.replace("timelineIcon", "icon-user");
-                                        list.push(res);
-                                    } else if (value[j].ClassId !== null && value[j].LessonId === null) {
-                                        res = announcement.replace("Baslik:", value[j].Title);
-                                        res = res.replace("duyuruTipi", "announcementClass");
-                                        res = res.replace("Aciklama:", value[j].Description);
-                                        res = res.replace("Tarih:",
-                                            new Date(parseInt(value[j].Date.substr(6))).format("dd.mm.yyyy  HH:MM"));
-                                        res = res.replace("Tipi:", "Sınıf: " + value[j].Class);
-                                        res = res.replace("Paylasan:", value[j].CreatedBy);
-                                        res = res.replace("arkaplanClass", "bg-blue-400");
-                                        res = res.replace("timelineIcon", "icon-pencil");
-                                        list.push(res);
-                                    } else if (value[j].ClassId !== null && value[j].LessonId !== null) {
-                                        res = announcement.replace("Baslik:", value[j].Title);
-                                        res = res.replace("duyuruTipi", "announcementLesson");
-                                        res = res.replace("Aciklama:", value[j].Description);
-                                        res = res.replace("Tarih:",
-                                            new Date(parseInt(value[j].Date.substr(6))).format("dd.mm.yyyy  HH:MM"));
-                                        res = res.replace("Tipi:", "Ders: " + value[j].Lesson);
-                                        res = res.replace("Paylasan:", value[j].CreatedBy);
+                                        res = res.replace("Tarih1", new Date(parseInt(value[j].StartTime.substr(6))).format("dd.mm.yyyy"));
+                                        res = res.replace("Tarih2", new Date(parseInt(value[j].EndTime.substr(6))).format("dd.mm.yyyy"));
+
+                                            res = res.replace("Tipi:", "Ders: " + value[j].LessonName);
+                                            res = res.replace("Paylasan:", value[j].CreatedBy);
                                         res = res.replace("arkaplanClass", "bg-indigo-400");
                                         res = res.replace("timelineIcon", "icon-books");
                                         list.push(res);
+
                                     }
-                                }
-                            });
-                        document.getElementById('duyurular').innerHTML = list.join("");
-                        $('body').loading('stop');
-                        var lessonCount = ($("#announcementLesson").length > 0) ? $("#announcementLesson").length : 0;
-                        var studentCount = ($("#announcementStudent").lenght > 0) ? $("#announcementStudent").lenght : 0;
-                        var classCount = ($("#announcementClass").length > 0 ? $("#announcementClass").length : 0);
-                        var allCount = $("#allCount").length + classCount + lessonCount + studentCount;
-                        $("#lessonCount").html(lessonCount);
-                        $("#studentCount").html(studentCount);
-                        $("#classCount").html(classCount);
-                        $("#allCount").html(allCount);
-                    });
+                                });
+                            document.getElementById('duyurular').innerHTML = list.join("");
+                            var allCount = $("#homework").length;
+                            $("#allCount").html(allCount);
+                            $('body').loading('stop');
+
+                        });
                 }
 
             });
         </script>
     }
+
+
+
+
+
     @if (Session["roleName"].ToString() != "Student")
     {
+
         <script type="text/javascript">
-            $(document).ready(function() {
+            $(document).ready(function () {
 
+                $('#myModal').on('shown.bs.modal',
+                    function () {
+                        $('#summernote').summernote({
+                            tabsize: 2,
+                            height: 50,
+                            lang: 'tr-TR',
+                            toolbar: [
+                                ['style', ['bold', 'italic', 'underline', 'clear']],
+                                ['font', ['strikethrough', 'superscript', 'subscript']],
+                                ['fontsize', ['fontsize']],
+                                ['color', ['color']],
+                                ['para', ['ul', 'ol', 'paragraph']],
+                                ['height', ['height']]
+                            ]
+                        });
+                    });
 
-                $('#examples').DataTable({
-                    "ajax": {
-                        "url": '/json/homework/' + @Session["userId"],
-                        "type": "GET",
-                        "datatype": "json"
-                    },
-                    "paging": false,
-                    "columns": [
-                        { "width": "2%", "title": "#ID", "data": "ID" },
-                        { "title": "Ödev", "data": "Title", "autoWidth": true },
-                        { "title": "Paylaşan", "data": "CreatedByName", "autoWidth": true },
-                        { "title": "Sınıf", "data": "ClassName", "autoWidth": true },
-                        { "title": "Ders", "data": "LessonName", "autoWidth": true },
-                        {
-                            "title": "Tarih",
-                            "data": "StartTime",
-                            "searchable": true,
-                            "sortable": true,
-                            "autoWitdh": true,
-                            "processing": true,
-                            "serverSide": true,
-                            "render": function (data, type, full, meta) {
-                                return 'Başlangıç: ' + new Date(parseInt(full.StartTime.substr(6))).format("dd/mm/yyyy") + ' <br/> Bitiş: ' + new Date(parseInt(full.EndTime.substr(6))).format("dd/mm/yyyy")+' ';
-                            }
-                        },
-                        {
-                            "title": "Dosya",
-                            "data": "FileName",
-                            "autoWitdh": true,
-                            "searchable": true,
-                            "sortable": true,
-                            "processing": true,
-                            "serverSide": true,
-                            "render": function(data, type, full, meta) {
-                                return '<a href="/Uploads/'+data+'">'+data+'</a>';
-                            }
-                        },
-                        {
-                            "title": "Seçenekler",
-                            "data": "ID",
-                            "width": "5%",
-                            "searchable": true,
-                            "sortable": true,
-                            "processing": true,
-                            "serverSide": true,
-                            "render": function(data, type, full, meta) {
-                                return '<div class="list-icons">' +
-                                    '										<div class="dropdown">' +
-                                    '											<a href="#" class="list-icons-item" data-toggle="dropdown" aria-expanded="false">' +
-                                    '												<i class="icon-menu9"></i>' +
-                                    '											</a>' +
-                                    '' +
-                                    '											<div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-158px, 19px, 0px); top: 0px; left: 0px; will-change: transform;">' +
-                                    '												<a href="#" data-id=' +
-                                    data +
-                                    ' class="update-link dropdown-item"><i class="icon-pen6"></i> Düzenle</a>' +
-                                    '												<a href="#" data-id=' +
-                                    data +
-                                    ' class="delete-link dropdown-item"><i class="icon-trash"></i> Sil</a>' +
-                                    '											</div>' +
-                                    '										</div>' +
-                                    '									</div>';
-                            }
+                function formClear() {
+                    $("#form")[0].reset();
+                    $(".modal-title").html("Yeni Ödev Ekle");
+                    $('#summernote').summernote('code', '');
+                    $("#ClassId").val(null).trigger('change');
+                    $("#LessonId").val(null).trigger('change');
+                    $('[type="date"]').prop('min', function () {
+                        return new Date().toJSON().split('T')[0];
+                    });
+                };
+
+                $("#add").click(function () {
+                    formClear();
+                    $("#attachment").empty();
+                });
+
+                var isValidate = false;
+                function formKontrol() {
+                    if ($("#StartTime").val() > $("#EndTime").val()) {
+                        isValidate = false;
+                        $.iziToast.Info("Başlangıç tarihi, bitiş tarihinden büyük olamaz.");
+                    } else {
+                        isValidate = true;
+                    }
+                }
+
+                $("form").submit(function (e) {
+                    e.preventDefault();
+
+                    formKontrol();
+
+                    if (isValidate === true) {
+                        $.imageUpload.Post("#Picture");
+                        var data = new Object();
+
+                        var filename = "";
+                        if ($("#Picture").val().length > 0) {
+
+                            var fileInput = document.getElementById('Picture');
+                            filename = fileInput.files[0].name;
+                        } else {
+                            filename = $("#pictures").val();
                         }
-                    ],
-                    autoWidth: false,
-                    dom:
-                        '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
-                    "order":
-                        [[0, "desc"]],
-                    "language":
-                    {
-                        "url":
-                            "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json"
+                        if ($('#ID').val().length >= 1) {
+                            data.ID = $('#ID').val();
+                        }
+                        data.Title = $('#title').val();
+                        data.Description = $('#summernote').summernote('code');
+                        data.LessonId = $("#LessonId").val();
+                        data.ClassId = $("#ClassId").val();
+                        data.StartTime = $("#StartTime").val();
+                        data.EndTime = $("#EndTime").val();
+                        data.FileName = filename;
+                        $.ajax({
+                            type: "POST",
+                            url: "/homework/add",
+                            data: JSON.stringify(data),
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (response) {
+                                if (response === "Success") {
+                                    $.iziToast.Success();
+                                    $("#examples").DataTable().ajax.reload();
+                                    $("#myModal").modal('hide');
+                                } else if (response === "Update") {
+                                    $.iziToast.Success();
+                                    $("#examples").DataTable().ajax.reload();
+                                    $("#myModal").modal('hide');
+                                } else if (response === "NoChanges") {
+                                    $.iziToast.Info("Herhangi bir değişiklik yapılmadı.");
+                                } else {
+                                    $.iziToast.Warning();
+                                    alert(response);
+                                }
+                            },
+                            failure: function (response) {
+                                alert(response.responseText);
+                            },
+                            error: function (response) {
+                                alert(response.responseText);
+                            }
+                        });
                     }
                 });
 
 
+            });
+        </script>
+
+        if (Session["roleName"].ToString() == "Admin")
+        {
+            <script type="text/javascript">
+                $(document).ready(function () {
+
+
+                    $.select2Ajax.VeriCek("#ClassId", "/json/select2/class/");
+                    $.select2Ajax.VeriCek("#LessonId", "/json/select2/lessons/");
+
+
+                    $('#examples').DataTable({
+                        "ajax": {
+                            "url": '/json/homework/',
+                            "type": "GET",
+                            "datatype": "json"
+                        },
+                        "paging": false,
+                        "columns": [
+                            { "width": "2%", "title": "#ID", "data": "ID" },
+                            { "title": "Ödev", "data": "Title", "autoWidth": true },
+                            { "title": "Paylaşan", "data": "CreatedByName", "autoWidth": true },
+                            { "title": "Sınıf", "data": "ClassName", "autoWidth": true },
+                            { "title": "Ders", "data": "LessonName", "autoWidth": true },
+                            {
+                                "title": "Tarih",
+                                "data": "StartTime",
+                                "searchable": true,
+                                "sortable": true,
+                                "autoWitdh": true,
+                                "processing": true,
+                                "serverSide": true,
+                                "render": function (data, type, full, meta) {
+                                    return 'Başlangıç: ' + new Date(parseInt(full.StartTime.substr(6))).format("dd/mm/yyyy") + ' <br/> Bitiş: ' + new Date(parseInt(full.EndTime.substr(6))).format("dd/mm/yyyy") + ' ';
+                                }
+                            },
+                            {
+                                "title": "Dosya",
+                                "data": "FileName",
+                                "autoWitdh": true,
+                                "searchable": true,
+                                "sortable": true,
+                                "processing": true,
+                                "serverSide": true,
+                                "render": function (data, type, full, meta) {
+                                    if (data != null) {
+                                        return '<i class="icon-attachment"></i> <a href="/Uploads/' + data + '">' + data + '</a>';
+                                    } else {
+                                        return 'Dosya eklenmedi.';
+                                    }
+                                }
+                            },
+                            {
+                                "title": "Seçenekler",
+                                "data": "ID",
+                                "width": "5%",
+                                "searchable": true,
+                                "sortable": true,
+                                "processing": true,
+                                "serverSide": true,
+                                "render": function (data, type, full, meta) {
+                                    return '<div class="list-icons">' +
+                                        '										<div class="dropdown">' +
+                                        '											<a href="#" class="list-icons-item" data-toggle="dropdown" aria-expanded="false">' +
+                                        '												<i class="icon-menu9"></i>' +
+                                        '											</a>' +
+                                        '' +
+                                        '											<div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-158px, 19px, 0px); top: 0px; left: 0px; will-change: transform;">' +
+                                        '												<a href="#" data-id=' +
+                                        data +
+                                        ' class="update-link dropdown-item"><i class="icon-pen6"></i> Düzenle</a>' +
+                                        '												<a href="#" data-id=' +
+                                        data +
+                                        ' class="delete-link dropdown-item"><i class="icon-trash"></i> Sil</a>' +
+                                        '											</div>' +
+                                        '										</div>' +
+                                        '									</div>';
+                                }
+                            }
+                        ],
+                        autoWidth: false,
+                        dom:
+                            '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
+                        "order":
+                            [[0, "desc"]],
+                        "language":
+                        {
+                            "url":
+                                "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json"
+                        }
+                    });
+                });
+
+            </script>
+        }
+        else
+        {
+            <script type="text/javascript">
+                $(document).ready(function () {
+
+
+                    $.select2Ajax.VeriCek("#ClassId", "/json/select2/teachers/class/" + @Session["userId"]);
+
+                    $('#ClassId').change('select2:selecting',
+                        function(e) {
+                            $.select2Ajax.VeriCek("#LessonId", "/json/select2/class/" + $("#ClassId option:selected").val());
+                        });
+
+                    $('#examples').DataTable({
+                        "ajax": {
+                            "url": '/json/homework/' + @Session["userId"],
+                            "type": "GET",
+                            "datatype": "json"
+                        },
+                        "paging": false,
+                        "columns": [
+                            { "width": "2%", "title": "#ID", "data": "ID" },
+                            { "title": "Ödev", "data": "Title", "autoWidth": true },
+                            { "title": "Paylaşan", "data": "CreatedByName", "autoWidth": true },
+                            { "title": "Sınıf", "data": "ClassName", "autoWidth": true },
+                            { "title": "Ders", "data": "LessonName", "autoWidth": true },
+                            {
+                                "title": "Tarih",
+                                "data": "StartTime",
+                                "searchable": true,
+                                "sortable": true,
+                                "autoWitdh": true,
+                                "processing": true,
+                                "serverSide": true,
+                                "render": function (data, type, full, meta) {
+                                    return 'Başlangıç: ' + new Date(parseInt(full.StartTime.substr(6))).format("dd/mm/yyyy") + ' <br/> Bitiş: ' + new Date(parseInt(full.EndTime.substr(6))).format("dd/mm/yyyy")+' ';
+                                }
+                            },
+                            {
+                                "title": "Dosya",
+                                "data": "FileName",
+                                "autoWitdh": true,
+                                "searchable": true,
+                                "sortable": true,
+                                "processing": true,
+                                "serverSide": true,
+                                "render": function(data, type, full, meta) {
+                                    return '<a href="/Uploads/'+data+'">'+data+'</a>';
+                                }
+                            },
+                            {
+                                "title": "Seçenekler",
+                                "data": "ID",
+                                "width": "5%",
+                                "searchable": true,
+                                "sortable": true,
+                                "processing": true,
+                                "serverSide": true,
+                                "render": function(data, type, full, meta) {
+                                    return '<div class="list-icons">' +
+                                        '										<div class="dropdown">' +
+                                        '											<a href="#" class="list-icons-item" data-toggle="dropdown" aria-expanded="false">' +
+                                        '												<i class="icon-menu9"></i>' +
+                                        '											</a>' +
+                                        '' +
+                                        '											<div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-158px, 19px, 0px); top: 0px; left: 0px; will-change: transform;">' +
+                                        '												<a href="#" data-id=' +
+                                        data +
+                                        ' class="update-link dropdown-item"><i class="icon-pen6"></i> Düzenle</a>' +
+                                        '												<a href="#" data-id=' +
+                                        data +
+                                        ' class="delete-link dropdown-item"><i class="icon-trash"></i> Sil</a>' +
+                                        '											</div>' +
+                                        '										</div>' +
+                                        '									</div>';
+                                }
+                            }
+                        ],
+                        autoWidth: false,
+                        dom:
+                            '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
+                        "order":
+                            [[0, "desc"]],
+                        "language":
+                        {
+                            "url":
+                                "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json"
+                        }
+                    });
+                });
+            </script>
+        }
+
+        <script type="text/javascript">
+            $(document).ready(function () {
+
+
+
+                function formatDate(inputDate) {
+                    var value = new Date(parseInt(inputDate.replace(/(^.*\()|([+-].*$)/g, '')));
+                    var formattedDate = value.getDate() + "." + value.getMonth() + 1 + "." + value.getFullYear();
+                    return formattedDate;
+                }
+
                 $('#examples tbody').on('click',
                     'a.delete-link',
-                    function() {
+                    function () {
                         var id = $(this).attr("data-id");
                         iziToast.question({
                             timeout: 20000,
@@ -555,22 +648,16 @@ else
                             position: 'center',
                             buttons: [
                                 [
-                                    '<button><b>Evet</b></button>', function(instance, toast) {
+                                    '<button><b>Evet</b></button>', function (instance, toast) {
                                         $.ajax({
                                             type: "POST",
-                                            url: '/announcement/delete/' + id,
-                                            success: function(response) {
+                                            url: '/homework/delete/' + id,
+                                            success: function (response) {
                                                 if (response === "Success") {
-                                                    iziToast.success({
-                                                        title: 'Başarılı',
-                                                        message: 'Silme işleminiz gerçekleşmiştir.'
-                                                    });
+                                                    $.iziToast.Success();
                                                     $("#examples").DataTable().ajax.reload();
                                                 } else {
-                                                    iziToast.warning({
-                                                        title: 'Hata',
-                                                        message: 'Lütfen tekrar deneyiniz.'
-                                                    });
+                                                    $.iziToast.Warning();
                                                 }
                                             }
                                         });
@@ -579,7 +666,7 @@ else
                                     }, true
                                 ],
                                 [
-                                    '<button>Hayır</button>', function(instance, toast) {
+                                    '<button>Hayır</button>', function (instance, toast) {
 
                                         instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
 
@@ -590,38 +677,73 @@ else
 
                     });
 
+                var attachmentHTML = '<div class="table-responsive">' +
+                    '<table class="table table-bordered mb-0">' +
+                    '<thead>' +
+                    '<tr>' +
+                    '<th style="width: 98%;">Ekli Dosyalar</th>' +
+                    '</tr>' +
+                    '</thead><tbody>' +
+                    '<tr>' +
+                    '<td>' +
+                    '<div class="tag tag-default">' +
+                    '<a class="title" href="fileUrl">FileName</a>' +
+                    '</div></td>' +
+                    '</tr></tbody></table></div>';
+
+
 
                 $('#examples tbody').on('click',
                     'a.update-link',
-                    function() {
+                    function () {
                         var id = $(this).attr("data-id");
                         $.ajax({
-                            url: '/json/announcement/details/' + id,
+                            url: '/json/homework/details/' + id,
                             type: 'GET',
                             dataType: 'json',
-                            success: function(data) {
+                            success: function (data) {
+                                $("#form")[0].reset();
+                                $('#summernote').summernote('code', '');
+                                $("#ClassId").val(null).trigger('change');
+                                $("#LessonId").val(null).trigger('change');
+                                $("#attachment").empty();
                                 $(".modal-title").html("Güncelle");
                                 $("#ID").val(data.data[0].ID);
-
                                 $('#title').val(data.data[0].Title);
                                 $('#summernote').summernote('code', data.data[0].Description);
-
-                                    $("#LessonId").select2("trigger",
-                                        "select",
-                                        { data: { text: data.data[0].Lesson, id: data.data[0].LessonId } });
-
-
-                                    $("#ClassId").select2("trigger",
-                                        "select",
-                                        { data: { text: data.data[0].Class, id: data.data[0].ClassId } });
+                                $("#LessonId").select2("trigger",
+                                    "select",
+                                    { data: { text: data.data[0].LessonName, id: data.data[0].LessonId } });
 
 
+                                $("#ClassId").select2("trigger",
+                                    "select",
+                                    { data: { text: data.data[0].ClassName, id: data.data[0].ClassId } });
 
+
+                                $('#StartTime').prop('value', function () {
+                                    var value = new Date(parseInt(data.data[0].StartTime.substr(6)));
+                                    value.setDate(value.getDate() + 1);
+                                    return value.toISOString().split('T')[0];
+                                });
+
+                                $('#EndTime').prop('value', function () {
+                                    var value = new Date(parseInt(data.data[0].EndTime.substr(6)));
+                                    value.setDate(value.getDate() + 1);
+                                    return value.toISOString().split('T')[0];
+                                });
+
+                                if (data.data[0].FileName != null) {
+                                    $("#pictures").val(data.data[0].FileName);
+                                    var res = attachmentHTML.replace("FileName", data.data[0].FileName);
+                                    res = res.replace("fileUrl", "/Uploads/" + data.data[0].FileName);
+                                    $("#attachment").append(res);
+                                } else {
+                                    $("#attachment").append("<h4>Dosya eklenmedi.</h4>");
+                                }
                                 $("#myModal").modal('show');
-
-
                             },
-                            error: function(err) {
+                            error: function (err) {
                                 alert("Error: " + err.responseText);
                             }
                         });
