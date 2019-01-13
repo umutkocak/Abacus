@@ -24,15 +24,12 @@
                             </div>
                             <form id="form">
                                 <div class="modal-body">
-
                                     <input type="text" id="ID" hidden="" class="form-control">
-
                                     <div class="form-group">
                                         <label>Öğrenci resmini seçin:</label>
                                         <input type="file" id="Picture" />
                                         <input type="text" hidden id="pictures" class="form-control">
                                     </div>
-
                                     <div class="form-group">
                                         <label>TC Kimlik Numarası</label>
                                         <input type="text" id="TCNumber" minlength="11" maxlength="11" class="form-control maxlength" placeholder="TC Kimlik Numarası">
@@ -46,9 +43,7 @@
                                             <label>Öğrenci Numarası</label>
                                             <input type="text" id="StudentNumber" class="form-control" placeholder="Öğrenci Kimliği">
                                         </div>
-
                                     </div>
-
                                     <div class="form-group row">
                                         <div class="col-md-6">
                                             <label>Sınıfı Seç</label>
@@ -59,9 +54,16 @@
                                             <input type="date" id="Birthday" class="form-control" placeholder="Doğum Tarihi">
                                         </div>
                                     </div>
-
-
-
+                                    <div class="form-group row">
+                                        <div class="col-md-6">
+                                            <label>Veli Adı Soyadı</label>
+                                            <input type="text" id="Parent" class="form-control" placeholder="Adı Soyadı">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Veli Cep Telefonu</label>
+                                            <input type="text" id="ParentNumber" minlength="11" maxlength="11" class="form-control maxlength" placeholder="Veli Cep Telefonu">
+                                        </div>
+                                    </div>
 
                                 </div>
                                 <div class="modal-footer">
@@ -212,6 +214,15 @@
                     } else if ($('#StudentNumber').val().length <= 0) {
                         $("#StudentNumber").attr("placeholder", "Zorunlu Alan (*)").focus();
                         isValidate = false;
+                    } else if ($('#Parent').val().length <= 0) {
+                        $("#Parent").attr("placeholder", "Zorunlu Alan (*)").focus();
+                        isValidate = false;
+                    } else if ($('#ParentNumber').val().length <= 0) {
+                        $("#ParentNumber").attr("placeholder", "Zorunlu Alan (*)").focus();
+                        isValidate = false;
+                    } else if ($('#ClassId').val() <= 0) {
+                        $.iziToast.Info("Lütfen sınıfı seçiniz");
+                        isValidate = false;
                     } else if ($('#Birthday').val().length <= 0) {
                         $("#Birthday").attr("placeholder", "Zorunlu Alan (*)").focus();
                         isValidate = false;
@@ -239,7 +250,10 @@
                     student.FullName = $('#FullName').val();
                     student.Birthday = $("#Birthday").val();
                     student.StudentNumber = $("#StudentNumber").val();
+                    student.Parent = $("#Parent").val();
+                    student.ParentNumber = $("#ParentNumber").val();
                     student.Picture = filename;
+                    student.CreatedDate = new Date();
                     var classStudent = new Object();
                     classStudent.ClassId = $("#ClassId").val();
                     $.ajax({
@@ -356,6 +370,8 @@
                             $("#FullName").val(data.data[0].Student.FullName);
                             $('#pictures').val(data.data[0].Student.Image);
                             $("#StudentNumber").val(data.data[0].Student.StudentNumber);
+                            $("#Parent").val(data.data[0].Student.Parent);
+                            $("#ParentNumber").val(data.data[0].Student.ParentNumber);
                             var date = new Date(parseInt(data.data[0].Student.Birthday.substr(6))).toISOString().split('T')[0];
                             $("#Birthday").val(date);
                             if (data.data[0].Class != null) {

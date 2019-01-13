@@ -32,6 +32,8 @@ namespace OBS.ViewModels
         public string FullName { get; set; }
         public string StudentNumber { get; set; }
         public DateTime? Birthday { get; set; }
+        public string Parent { get; set; }
+        public string ParentNumber { get; set; }
     }
 
     public class StudentViewModel

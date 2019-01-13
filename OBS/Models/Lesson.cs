@@ -26,6 +26,8 @@ public partial class Lesson
 
         this.Announcements = new HashSet<Announcements>();
 
+        this.Notes = new HashSet<Notes>();
+
     }
 
 
@@ -42,6 +44,10 @@ public partial class Lesson
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 
     public virtual ICollection<Announcements> Announcements { get; set; }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+
+    public virtual ICollection<Notes> Notes { get; set; }
 
 }
 

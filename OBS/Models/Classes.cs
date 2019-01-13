@@ -26,9 +26,9 @@ public partial class Classes
 
         this.ClassStudents = new HashSet<ClassStudents>();
 
-        this.Notes = new HashSet<Notes>();
-
         this.Announcements = new HashSet<Announcements>();
+
+        this.Notes = new HashSet<Notes>();
 
     }
 
@@ -49,15 +49,15 @@ public partial class Classes
 
     public virtual ICollection<ClassStudents> ClassStudents { get; set; }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-
-    public virtual ICollection<Notes> Notes { get; set; }
-
     public virtual Teachers Teachers { get; set; }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 
     public virtual ICollection<Announcements> Announcements { get; set; }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+
+    public virtual ICollection<Notes> Notes { get; set; }
 
 }
 

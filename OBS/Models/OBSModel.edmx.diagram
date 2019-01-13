@@ -9,28 +9,33 @@
         <EntityTypeShape EntityType="OBSModel.ClassLessons" Width="1.5" PointX="10.5" PointY="9" IsExpanded="true" />
         <EntityTypeShape EntityType="OBSModel.ClassStudents" Width="1.5" PointX="10.5" PointY="5.875" IsExpanded="true" />
         <EntityTypeShape EntityType="OBSModel.Lesson" Width="1.5" PointX="5.25" PointY="15.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="OBSModel.Notes" Width="1.5" PointX="10.5" PointY="12.25" IsExpanded="true" />
         <EntityTypeShape EntityType="OBSModel.Professions" Width="1.5" PointX="0.75" PointY="9.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="OBSModel.Users" Width="1.5" PointX="5.25" PointY="4.75" IsExpanded="true" />
         <AssociationConnector Association="OBSModel.FK_ClassLessons_Classes" ManuallyRouted="false" />
         <AssociationConnector Association="OBSModel.FK_ClassStudents_Classes" ManuallyRouted="false" />
-        <AssociationConnector Association="OBSModel.FK_Notes_Classes" ManuallyRouted="false" />
         <AssociationConnector Association="OBSModel.FK_ClassLessons_Lesson" ManuallyRouted="false" />
-        <EntityTypeShape EntityType="OBSModel.Students" Width="1.5" PointX="0.75" PointY="11.75" />
         <EntityTypeShape EntityType="OBSModel.Teachers" Width="1.5" PointX="3.75" PointY="8.75" />
         <AssociationConnector Association="OBSModel.FK_Classes_Teachers" />
-        <AssociationConnector Association="OBSModel.FK_ClassStudents_Students" />
-        <AssociationConnector Association="OBSModel.FK_Notes_Students" />
-        <AssociationConnector Association="OBSModel.FK_Notes_Teachers" />
         <AssociationConnector Association="OBSModel.FK_Teachers_Professions" />
-        <AssociationConnector Association="OBSModel.FK_Users_Students" />
-        <AssociationConnector Association="OBSModel.FK_Users_Teachers" />
         <EntityTypeShape EntityType="OBSModel.ClassSchedule" Width="1.5" PointX="0.75" PointY="0.75" />
         <EntityTypeShape EntityType="OBSModel.Announcements" Width="1.5" PointX="7.5" PointY="11.375" />
         <AssociationConnector Association="OBSModel.FK_Announcements_Classes" />
         <AssociationConnector Association="OBSModel.FK_Announcements_Lesson" />
-        <AssociationConnector Association="OBSModel.FK_Announcements_Students" />
         <EntityTypeShape EntityType="OBSModel.HomeWork" Width="1.5" PointX="3.375" PointY="0.75" />
+        <EntityTypeShape EntityType="OBSModel.Appointment" Width="1.5" PointX="8" PointY="7.375" />
+        <AssociationConnector Association="OBSModel.FK_Appointment_Teachers" />
+        <EntityTypeShape EntityType="OBSModel.Notes" Width="1.5" PointX="11.875" PointY="12.125" />
+        <AssociationConnector Association="OBSModel.FK_Notes_Classes" />
+        <AssociationConnector Association="OBSModel.FK_Notes_Lesson" />
+        <EntityTypeShape EntityType="OBSModel.Users" Width="1.5" PointX="8" PointY="15.625" />
+        <AssociationConnector Association="OBSModel.FK_Users_Teachers" />
+        <EntityTypeShape EntityType="OBSModel.Absenteeism" Width="1.5" PointX="3" PointY="12.625" />
+        <EntityTypeShape EntityType="OBSModel.Students" Width="1.5" PointX="0.75" PointY="12.25" />
+        <AssociationConnector Association="OBSModel.FK_Absenteeism_Students" />
+        <AssociationConnector Association="OBSModel.FK_Announcements_Students" />
+        <AssociationConnector Association="OBSModel.FK_Appointment_Students" />
+        <AssociationConnector Association="OBSModel.FK_ClassStudents_Students" />
+        <AssociationConnector Association="OBSModel.FK_Notes_Students" />
+        <AssociationConnector Association="OBSModel.FK_Users_Students" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

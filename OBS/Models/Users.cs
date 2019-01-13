@@ -34,15 +34,11 @@ public partial class Users
 
     public string Picture { get; set; }
 
-    public string Parent { get; set; }
 
-    public string ParentNumber { get; set; }
-
-
-
-    public virtual Students Students { get; set; }
 
     public virtual Teachers Teachers { get; set; }
+
+    public virtual Students Students { get; set; }
 
 }
 

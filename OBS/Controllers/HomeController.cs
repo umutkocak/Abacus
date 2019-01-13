@@ -4,6 +4,9 @@ using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
+using System.Net.Mime;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -21,7 +24,7 @@ namespace OBS.Controllers
         {
             ViewBag.UserId = Session["userId"];
             ViewBag.UserName = Session["userName"];
-            return View();
+            return View(Login(""));
         }
 
         #region ActionResult
@@ -131,6 +134,18 @@ namespace OBS.Controllers
             return View();
         }
 
+        [Route("exam")]
+        public ActionResult Exam()
+        {
+            return View();
+        }
+
+        [Route("absenteeism")]
+        public ActionResult Absenteeism()
+        {
+            return View();
+        }
+
         #endregion
 
         #region JsonResults
@@ -150,7 +165,7 @@ namespace OBS.Controllers
                 TeacherCount = _db.Teachers.Count()
             };
 
-            return Json(new {data}, JsonRequestBehavior.AllowGet);
+            return Json(new { data }, JsonRequestBehavior.AllowGet);
         }
 
         #endregion
@@ -248,8 +263,7 @@ namespace OBS.Controllers
                         var teacherCheck = _db.Teachers.FirstOrDefault(x => x.TCNumber == us.Username);
                         if (teacherCheck != null)
                         {
-                            var tch = _db.Users.FirstOrDefault(x =>
-                                x.Password == us.Password && x.StudentId == studentCheck.ID);
+                            var tch = _db.Users.FirstOrDefault(x => x.Password == us.Password);
                             if (tch != null)
                             {
                                 FormsAuthentication.SetAuthCookie(us.Username, true);
@@ -513,7 +527,9 @@ namespace OBS.Controllers
                     FullName = p.FullName,
                     StudentNumber = p.StudentNumber,
                     Birthday = p.Birthday,
-                    Image = p.Picture
+                    Image = p.Picture,
+                    Parent = p.Parent,
+                    ParentNumber = p.ParentNumber
                 },
                 ClassId = _db.ClassStudents.FirstOrDefault(s => s.StudentID == p.ID)?.Classes.ID,
                 Class = _db.ClassStudents.FirstOrDefault(s => s.StudentID == p.ID)?.Classes.ClassName
@@ -538,7 +554,9 @@ namespace OBS.Controllers
                     StudentNumber = item.StudentNumber,
                     FullName = item.FullName,
                     Birthday = item.Birthday,
-                    Image = item.Picture
+                    Image = item.Picture,
+                    Parent = item.Parent,
+                    ParentNumber = item.ParentNumber
                 },
                 ClassId = clsId,
                 Class = _db.Classes.FirstOrDefault(x => x.ID == clsId)?.ClassName
@@ -559,6 +577,7 @@ namespace OBS.Controllers
                     foreach (var j in clsLsn)
                     {
                         _db.ClassStudents.Remove(j);
+                        _db.SaveChanges();
                     }
                     var classStdFind =
                         _db.ClassStudents.FirstOrDefault(x => x.StudentID == std.ID && x.ClassId == clsStd.ClassId);
@@ -584,7 +603,7 @@ namespace OBS.Controllers
                     {
                         return Json("Saved");
                     }
-                    std.Birthday = DateTime.Now;
+
                     _db.Students.Add(std);
 
                     var login = new Users
@@ -608,6 +627,24 @@ namespace OBS.Controllers
                             ModifiedDate = DateTime.Today
                         };
                         _db.ClassStudents.Add(classStd);
+
+                        var classLesson = _db.ClassLessons.Where(x => x.ClassID == clsStd.ClassId).ToList();
+                        for (int i = 1; i <= 2; i++)
+                        {
+                            foreach (var j in classLesson)
+                            {
+                                var stdNote = new Notes
+                                {
+                                    ClassId = clsStd.ClassId,
+                                    CreatedDate = DateTime.Now,
+                                    LessonId = j.LessonID,
+                                    Period = i,
+                                    StudentId = std.ID
+                                };
+                                _db.Notes.Add(stdNote);
+                            }
+                        }
+
                     }
                     else
                     {
@@ -886,7 +923,9 @@ namespace OBS.Controllers
                             StudentNumber = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.StudentNumber,
                             FullName = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.FullName,
                             Birthday = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Birthday,
-                            Image = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Picture
+                            Image = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Picture,
+                            Parent = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Parent,
+                            ParentNumber = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.ParentNumber
                         });
                     }
                     addClass.Lessons = lessonList;
@@ -928,7 +967,9 @@ namespace OBS.Controllers
                             StudentNumber = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.StudentNumber,
                             FullName = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.FullName,
                             Birthday = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Birthday,
-                            Image = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Picture
+                            Image = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Picture,
+                            ParentNumber = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.ParentNumber,
+                            Parent = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Parent
                         });
                     }
                     addClass.Lessons = lessonList;
@@ -978,7 +1019,9 @@ namespace OBS.Controllers
                         StudentNumber = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.StudentNumber,
                         FullName = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.FullName,
                         Birthday = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Birthday,
-                        Image = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Picture
+                        Image = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Picture,
+                        Parent = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.Parent,
+                        ParentNumber = _db.Students.FirstOrDefault(x => x.ID == j.StudentID)?.ParentNumber
                     });
                 }
                 addClass.Lessons = lessonList;
@@ -1002,10 +1045,7 @@ namespace OBS.Controllers
                     {
                         _db.ClassLessons.Remove(j);
                     }
-
-
                     _db.Entry(cls).State = EntityState.Modified;
-
                     foreach (var i in lessons)
                     {
                         var lesson = new ClassLessons
@@ -1013,13 +1053,9 @@ namespace OBS.Controllers
                             ClassID = cls.ID,
                             LessonID = i
                         };
-
                         _db.ClassLessons.Add(lesson);
+
                     }
-
-
-
-
                     return Json(_db.SaveChanges() > 0 ? "Update" : "Error");
                 }
                 else
@@ -1558,7 +1594,9 @@ namespace OBS.Controllers
                 var list = _db.Announcements.Where(x => x.AllUser == true || x.StudentId == stdId || x.ClassId == stdClassId).OrderByDescending(x => x.Date).ToList();
                 foreach (var i in list)
                 {
-                    var createdId = _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.TeacherId ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID;
+                    var createdIdTch = _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.TeacherId;
+                    var createdIdUser = _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID;
+
                     data.Add(new AnnouncementListViewModel
                     {
                         ID = i.ID,
@@ -1573,7 +1611,7 @@ namespace OBS.Controllers
                         Class = _db.Classes.FirstOrDefault(x => x.ID == i.ClassId)?.ClassName,
                         Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName,
                         CreatedByID = _db.Teachers.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID ?? _db.Users.FirstOrDefault(x => x.ID == i.CreatedBy)?.ID,
-                        CreatedBy = _db.Teachers.FirstOrDefault(x => x.ID == createdId)?.FullName ?? _db.Users.FirstOrDefault(x => x.ID == createdId)?.Username
+                        CreatedBy = _db.Teachers.FirstOrDefault(x => x.ID == createdIdTch)?.FullName ?? _db.Users.FirstOrDefault(x => x.ID == createdIdUser)?.Username
                     });
                 }
                 return Json(new { data = data }, JsonRequestBehavior.AllowGet);
@@ -1635,6 +1673,520 @@ namespace OBS.Controllers
         }
 
 
+        #endregion
+
+        #region Appointment
+
+        [Route("appointment/add"), HttpPost]
+        public JsonResult AppointmentAdd(Appointment appo)
+        {
+            if (appo.ID > 0)
+            {
+                var oldAppo = _db.Appointment.FirstOrDefault(x => x.ID == appo.ID);
+
+                if (oldAppo != null)
+                {
+                    if (appo.Status == oldAppo.Status)
+                    {
+                        return Json("Saved");
+                    }
+                    var data = new Appointment
+                    {
+                        ID = appo.ID,
+                        CreatedDate = oldAppo.CreatedDate,
+                        Date = appo.Date,
+                        Status = appo.Status,
+                        StudentId = appo.StudentId,
+                        StudentMessage = oldAppo.StudentMessage,
+                        TeacherId = appo.TeacherId,
+                        TeacherMessage = appo.TeacherMessage,
+                        Time = appo.Time
+                    };
+                    _db.Set<Appointment>().AddOrUpdate(data);
+                    var status = "";
+                    if (_db.SaveChanges() > 0)
+                    {
+                        if (appo.Status == "Kabul")
+                        {
+                            var mailFind = _db.Users.FirstOrDefault(k => k.StudentId == appo.StudentId)?.Email;
+                            if (mailFind != null)
+                            {
+                                var tchId = _db.Users.FirstOrDefault(x => x.TeacherId == appo.TeacherId)?.TeacherId;
+                                var stdId = _db.Users.FirstOrDefault(x => x.ID == appo.StudentId)?.StudentId;
+
+                                var message = new MailMessage();
+                                var smtp = new SmtpClient();
+
+                                message.From = new MailAddress("abakusbilgisistemi@hotmail.com");  // gönderen email adresi
+                                message.To.Add(new MailAddress(mailFind));
+                                message.Subject = "ABAKÜS - Randevu Bilgi Mesajı";
+                                string body;
+                                var fileToRead = Server.MapPath("~/Content/mail/appointment.html");
+                                using (var reader = new StreamReader(fileToRead))
+                                {
+                                    body = reader.ReadToEnd();
+                                }
+                                body = body.Replace("{Ogretmen}", _db.Teachers.FirstOrDefault(x => x.ID == tchId)?.FullName);
+                                body = body.Replace("{Mesaj}", appo.TeacherMessage);
+                                body = body.Replace("{Tarih}", appo.Date.ToString().Substring(0, 10));
+                                body = body.Replace("{Saat}", appo.Time);
+                                message.Body = body;
+                                message.IsBodyHtml = true;
+                                smtp.Port = 587;
+                                smtp.Host = "smtp-mail.outlook.com";
+                                smtp.EnableSsl = true;
+                                smtp.UseDefaultCredentials = false;
+                                smtp.Credentials = new NetworkCredential("abakusbilgisistemi@hotmail.com", "abakus.123");
+                                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                                smtp.Send(message);
+
+
+
+                            }
+                        }
+                        status = "Success";
+                    }
+                    else
+                    {
+                        status = "NoChanges";
+                    }
+                    return Json(status);
+                }
+            }
+            else
+            {
+                var stdId = _db.Users.FirstOrDefault(x => x.ID == appo.StudentId)?.StudentId;
+                var data = new Appointment
+                {
+                    CreatedDate = DateTime.Now,
+                    Date = appo.Date,
+                    Status = appo.Status,
+                    StudentId = _db.Users.FirstOrDefault(x => x.ID == appo.StudentId)?.StudentId,
+                    StudentMessage = appo.StudentMessage,
+                    TeacherId = appo.TeacherId,
+                    TeacherMessage = appo.TeacherMessage,
+                    Time = appo.Time
+                };
+                _db.Set<Appointment>().AddOrUpdate(data);
+                return Json(_db.SaveChanges() > 0 ? "Success" : "Error");
+
+            }
+            return Json(appo, JsonRequestBehavior.AllowGet);
+        }
+
+
+        [Route("json/appointment"), HttpGet]
+        public JsonResult AppointmentList()
+        {
+            var data = new List<AppointmentViewModel>();
+
+            var dataList = _db.Appointment.OrderByDescending(x => x.CreatedDate).ToList();
+            foreach (var i in dataList)
+            {
+                data.Add(new AppointmentViewModel
+                {
+                    ID = i.ID,
+                    TeacherId = i.TeacherId,
+                    StudentId = i.StudentId,
+                    CreatedDate = i.CreatedDate,
+                    Date = i.Date,
+                    Status = i.Status,
+                    Time = i.Time,
+                    StudentMessage = i.StudentMessage,
+                    TeacherMessage = i.TeacherMessage,
+                    Teacher = _db.Teachers.FirstOrDefault(x => x.ID == i.TeacherId)?.FullName,
+                    Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName
+                });
+            }
+
+            return Json(new { data }, JsonRequestBehavior.AllowGet);
+        }
+
+        [Route("json/appointment/{id?}"), HttpGet]
+        public JsonResult AppointmentList(int? id)
+        {
+            var data = new List<AppointmentViewModel>();
+
+            var stdId = _db.Users.FirstOrDefault(x => x.ID == id)?.StudentId;
+            var tchId = _db.Users.FirstOrDefault(x => x.ID == id)?.TeacherId;
+            if (stdId != null)
+            {
+                var stdAppoList = _db.Appointment.Where(x => x.StudentId == stdId).OrderByDescending(x => x.CreatedDate).ToList();
+                foreach (var i in stdAppoList)
+                {
+                    data.Add(new AppointmentViewModel
+                    {
+                        ID = i.ID,
+                        TeacherId = i.TeacherId,
+                        StudentId = i.StudentId,
+                        CreatedDate = i.CreatedDate,
+                        Date = i.Date,
+                        Status = i.Status,
+                        Time = i.Time,
+                        StudentMessage = i.StudentMessage,
+                        TeacherMessage = i.TeacherMessage,
+                        Teacher = _db.Teachers.FirstOrDefault(x => x.ID == i.TeacherId)?.FullName,
+                        Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName
+                    });
+                }
+            }
+            else if (tchId != null)
+            {
+                var tchAppoList = _db.Appointment.Where(x => x.TeacherId == tchId).OrderByDescending(x => x.CreatedDate).ToList();
+                foreach (var i in tchAppoList)
+                {
+                    data.Add(new AppointmentViewModel
+                    {
+                        ID = i.ID,
+                        TeacherId = i.TeacherId,
+                        StudentId = i.StudentId,
+                        CreatedDate = i.CreatedDate,
+                        Date = i.Date,
+                        Status = i.Status,
+                        Time = i.Time,
+                        StudentMessage = i.StudentMessage,
+                        TeacherMessage = i.TeacherMessage,
+                        Teacher = _db.Teachers.FirstOrDefault(x => x.ID == i.TeacherId)?.FullName,
+                        Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName
+                    });
+                }
+            }
+            else
+            {
+                var appoList = _db.Appointment.OrderByDescending(x => x.CreatedDate).ToList();
+                foreach (var i in appoList)
+                {
+                    data.Add(new AppointmentViewModel
+                    {
+                        ID = i.ID,
+                        TeacherId = i.TeacherId,
+                        StudentId = i.StudentId,
+                        CreatedDate = i.CreatedDate,
+                        Date = i.Date,
+                        Status = i.Status,
+                        Time = i.Time,
+                        StudentMessage = i.StudentMessage,
+                        TeacherMessage = i.TeacherMessage,
+                        Teacher = _db.Teachers.FirstOrDefault(x => x.ID == i.TeacherId)?.FullName,
+                        Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName
+                    });
+                }
+
+            }
+
+            return Json(new { data }, JsonRequestBehavior.AllowGet);
+        }
+
+        [Route("json/appointment/details/{id?}"), HttpGet]
+        public JsonResult AppointmentDetails(int? id)
+        {
+            var data = new List<AppointmentViewModel>();
+            var appoList = _db.Appointment.Where(x => x.ID == id).ToList();
+            foreach (var i in appoList)
+            {
+                data.Add(new AppointmentViewModel
+                {
+                    ID = i.ID,
+                    TeacherId = i.TeacherId,
+                    StudentId = i.StudentId,
+                    CreatedDate = i.CreatedDate,
+                    Date = i.Date,
+                    Status = i.Status,
+                    Time = i.Time,
+                    StudentMessage = i.StudentMessage,
+                    TeacherMessage = i.TeacherMessage,
+                    Teacher = _db.Teachers.FirstOrDefault(x => x.ID == i.TeacherId)?.FullName,
+                    Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName
+                });
+            }
+            return Json(new { data }, JsonRequestBehavior.AllowGet);
+
+        }
+
+        [Route("appointment/delete/{id?}"), HttpPost]
+        public JsonResult AppointmentDelete(int id)
+        {
+            var appo = _db.Appointment.ToList().Find(x => x.ID == id);
+            if (appo != null)
+            {
+                _db.Appointment.Remove(appo);
+                return Json(_db.SaveChanges() > 0 ? "Success" : "Error");
+            }
+
+            return Json(appo, JsonRequestBehavior.AllowGet);
+        }
+
+
+        #endregion
+
+        #region Exam
+
+        public JsonResult Get(int? page, int? limit, int? classId, int? lessonId, int? period)
+        {
+            List<ExamViewModel> records;
+            int total;
+            var query = _db.Notes.Where(x => x.ClassId == classId && x.LessonId == lessonId && x.Period == period).Select(p => new ExamViewModel
+            {
+                ID = p.ID,
+                StudentId = p.StudentId,
+                ClassId = p.ClassId,
+                Lesson = p.LessonId != null ? p.Lesson.LessonName : "",
+                Student = p.StudentId != null ? p.Students.FullName : "",
+                Class = p.ClassId != null ? p.Classes.ClassName : "",
+                CreatedDate = p.CreatedDate,
+                LessonId = p.LessonId,
+                FirstNote = p.FirstNote,
+                Period = p.Period,
+                ProjectNote = p.ProjectNote,
+                SecondNote = p.SecondNote,
+                ThirdNote = p.ThirdNote,
+                VerbalNote = p.VerbalNote
+            });
+
+
+            total = query.Count();
+            if (page.HasValue && limit.HasValue)
+            {
+                int start = (page.Value - 1) * limit.Value;
+                records = query.OrderBy(x => x.ID).Skip(start).Take(limit.Value).ToList();
+            }
+            else
+            {
+                records = query.ToList();
+            }
+
+
+            return this.Json(new { records, total }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult Save(Notes record)
+        {
+            if (record.ID > 0)
+            {
+                var entity = _db.Notes.First(p => p.ID == record.ID);
+                entity.ClassId = record.ClassId;
+                entity.FirstNote = record.FirstNote;
+                entity.SecondNote = record.SecondNote;
+                entity.ThirdNote = record.ThirdNote;
+                entity.ProjectNote = record.ProjectNote;
+                entity.VerbalNote = record.VerbalNote;
+                entity.CreatedDate = entity.CreatedDate;
+                entity.Period = record.Period;
+                entity.LessonId = record.LessonId;
+                entity.StudentId = record.StudentId;
+            }
+            else
+            {
+                _db.Notes.Add(new Notes
+                {
+
+                    ClassId = record.ClassId,
+                    FirstNote = record.FirstNote,
+                    SecondNote = record.SecondNote,
+                    ThirdNote = record.ThirdNote,
+                    ProjectNote = record.ProjectNote,
+                    VerbalNote = record.VerbalNote,
+                    CreatedDate = DateTime.Now,
+                    Period = record.Period,
+                    LessonId = record.LessonId,
+                    StudentId = record.StudentId,
+
+                });
+            }
+            _db.SaveChanges();
+
+            return Json(new { result = true });
+        }
+
+        [HttpPost]
+        public JsonResult Delete(int id)
+        {
+
+            Notes entity = _db.Notes.First(p => p.ID == id);
+            _db.Notes.Remove(entity);
+            _db.SaveChanges();
+
+            return Json(new { result = true });
+        }
+
+
+        #endregion
+
+        #region Student Exam
+
+        [Route("exam/students/{id?}/{period?}"), HttpGet]
+        public JsonResult StudentExam(int? id, int? period)
+        {
+            var stdId = _db.Users.FirstOrDefault(x => x.ID == id)?.StudentId;
+            var data = new List<ExamViewModel>();
+            if (stdId != null)
+            {
+                var studentExam = _db.Notes.Where(x => x.StudentId == stdId && x.Period == period).ToList();
+                foreach (var i in studentExam)
+                {
+                    data.Add(new ExamViewModel
+                    {
+                        ID = i.ID,
+                        StudentId = i.StudentId,
+                        Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName,
+                        ClassId = i.ClassId,
+                        Class = _db.Classes.FirstOrDefault(x => x.ID == i.ClassId)?.ClassName,
+                        LessonId = i.LessonId,
+                        Lesson = _db.Lesson.FirstOrDefault(x => x.ID == i.LessonId)?.LessonName,
+                        Period = i.Period,
+                        FirstNote = i.FirstNote,
+                        SecondNote = i.SecondNote,
+                        ThirdNote = i.ThirdNote,
+                        ProjectNote = i.ProjectNote,
+                        VerbalNote = i.VerbalNote
+                    });
+                }
+            }
+
+            return Json(new { data }, JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion
+
+        #region Absenteeism
+
+        [Route("json/absenteeism/list"), HttpGet]
+        public JsonResult AbsenteeismList()
+        {
+            var data = _db.Absenteeism.ToList();
+
+            var dataList = new List<AbsenteeismViewModel>();
+            foreach (var i in data)
+            {
+                dataList.Add(new AbsenteeismViewModel
+                {
+                    ID = i.ID,
+                    StudentId = i.StudentId,
+                    Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName,
+                    StudentNumber = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.StudentNumber,
+                    Status = i.Status,
+                    Date = i.Date,
+                    IsFullDay = true
+                });
+
+
+            }
+            return Json(new { events = dataList }, JsonRequestBehavior.AllowGet);
+        }
+
+        [Route("json/absenteeism/{id?}")]
+        public JsonResult AbsenteeismList(int? id)
+        {
+            var dataList = new List<AbsenteeismViewModel>();
+            var stdId = _db.Users.FirstOrDefault(x => x.ID == id)?.StudentId;
+            var tchId = _db.Users.FirstOrDefault(x => x.ID == id)?.TeacherId;
+
+            if (stdId != null)
+            {
+                var data = _db.Absenteeism.Where(x => x.StudentId == stdId).ToList();
+                foreach (var i in data)
+                {
+                    dataList.Add(new AbsenteeismViewModel
+                    {
+                        ID = i.ID,
+                        StudentId = i.StudentId,
+                        Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName,
+                        StudentNumber = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.StudentNumber,
+                        Status = i.Status,
+                        Date = i.Date,
+                        IsFullDay = true
+                    });
+                }
+
+
+            }
+            else if (tchId != null)
+            {
+                var tchClass = _db.Classes.FirstOrDefault(x => x.TeacherID == tchId)?.ID;
+                var classStd = _db.ClassStudents.Where(x => x.ClassId == tchClass).ToList();
+
+                foreach (var j in classStd)
+                {
+                    var data = _db.Absenteeism.Where(x => x.StudentId == j.StudentID).ToList();
+                    foreach (var i in data)
+                    {
+                        dataList.Add(new AbsenteeismViewModel
+                        {
+                            ID = i.ID,
+                            StudentId = i.StudentId,
+                            Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName,
+                            StudentNumber = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.StudentNumber,
+                            Status = i.Status,
+                            Date = i.Date,
+                            IsFullDay = true
+                        });
+                    }
+                }
+            }
+            else
+            {
+                var data = _db.Absenteeism.ToList();
+                foreach (var i in data)
+                {
+                    dataList.Add(new AbsenteeismViewModel
+                    {
+                        ID = i.ID,
+                        StudentId = i.StudentId,
+                        Student = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.FullName,
+                        StudentNumber = _db.Students.FirstOrDefault(x => x.ID == i.StudentId)?.StudentNumber,
+                        Status = i.Status,
+                        Date = i.Date,
+                        IsFullDay = true
+                    });
+                }
+            }
+
+            return Json(new { events = dataList }, JsonRequestBehavior.AllowGet);
+        }
+
+        [Route("absenteeism/add")]
+        public JsonResult AbsenteeismAdd(Absenteeism abs, int[] std)
+        {
+            if (abs.ID > 0)
+            {
+                int stdId = std[0];
+                abs.StudentId = stdId;
+                _db.Set<Absenteeism>().AddOrUpdate(abs);
+                return Json(_db.SaveChanges() > 0 ? "Success" : "NoChanges");
+            }
+            else
+            {
+                foreach (var i in std)
+                {
+                    var data = new Absenteeism
+                    {
+                        Date = abs.Date,
+                        IsFullDay = true,
+                        Status = abs.Status,
+                        StudentId = i
+                    };
+                    _db.Absenteeism.Add(data);
+                }
+
+                return Json(_db.SaveChanges() > 0 ? "Success" : "Error");
+            }
+        }
+
+
+        [Route("absenteeism/delete/{id?}")]
+        [HttpPost]
+        public JsonResult AbsenteeismDelete(int id)
+        {
+            var abs = _db.Absenteeism.ToList().Find(x => x.ID == id);
+            if (abs != null)
+            {
+                _db.Absenteeism.Remove(abs);
+                return Json(_db.SaveChanges() > 0 ? "Success" : "Error");
+            }
+
+            return Json(abs, JsonRequestBehavior.AllowGet);
+        }
         #endregion
 
         #region Select2 Datas

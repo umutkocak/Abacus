@@ -258,7 +258,7 @@ else
                         '</div>' +
                         '' +
                         '<div class="card">' +
-                        '<div class="card-header header-elements-sm-inline">' +
+                        '<div class="card-header arkaplanClass text-white header-elements-inline">' +
                         '<h6 class="card-title">Baslik:</h6>' +
                         '<div class="header-elements">' +
                         '</div>' +
@@ -299,7 +299,8 @@ else
                                         res = res.replace("Tarih2", new Date(parseInt(value[j].EndTime.substr(6))).format("dd.mm.yyyy"));
 
                                             res = res.replace("Tipi:", "Ders: " + value[j].LessonName);
-                                            res = res.replace("Paylasan:", value[j].CreatedBy);
+                                        res = res.replace("Paylasan:", value[j].CreatedByName);
+                                        res = res.replace("arkaplanClass", "bg-indigo-400");
                                         res = res.replace("arkaplanClass", "bg-indigo-400");
                                         res = res.replace("timelineIcon", "icon-books");
                                         list.push(res);
@@ -720,7 +721,7 @@ else
                                     "select",
                                     { data: { text: data.data[0].ClassName, id: data.data[0].ClassId } });
 
-
+                                
                                 $('#StartTime').prop('value', function () {
                                     var value = new Date(parseInt(data.data[0].StartTime.substr(6)));
                                     value.setDate(value.getDate() + 1);

@@ -94,7 +94,7 @@
                             {
                                 @Html.Label("Öğretmen")
                             }
-                            else if(status == "Student")
+                            else if (status == "Student")
                             {
                                 @Html.Label("Sınıfı: ")
                                 @Session["className"].ToString();
@@ -143,16 +143,36 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="/" class="nav-link">
-                            <i class="icon-pen2"></i>
-                            <span>Sınav Notlarım</span>
+                        <a href="/absenteeism" class="nav-link">
+                            <i class="icon-calendar52"></i>
+                            <span>Devamsızlık</span>
                         </a>
                     </li>
 
                     <li class="nav-item">
+                        <a href="/exam" class="nav-link">
+                            <i class="icon-pen2"></i>
+                            <span>Sınav Notlarım</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="/appointment" class="nav-link">
                             <i class="icon-calendar5"></i>
                             <span>Randevularım</span>
+                            @{
+
+                                var userId = Convert.ToInt32(Session["userId"]);
+                                var stdId = _db.Users.FirstOrDefault(x => x.ID == userId)?.StudentId;
+
+                                if (stdId != null)
+                                {
+                                    var appo = _db.Appointment.Count(x => x.StudentId == stdId && x.Status == "Onay Bekleniyor");
+                                    if (appo > 0)
+                                    {
+                                        <span class="badge badge-pill bg-blue ml-auto">@appo</span>
+                                    }
+                                }
+                            }
                         </a>
                     </li>
 
@@ -200,8 +220,15 @@
                             <span>Ödevler</span>
                         </a>
                     </li>
+
                     <li class="nav-item">
-                        <a href="#0" class="nav-link">
+                        <a href="/absenteeism" class="nav-link">
+                            <i class="icon-calendar52"></i>
+                            <span>Devamsızlık</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/exam" class="nav-link">
                             <i class="icon-pencil6"></i>
                             <span>Not Yönetimi</span>
                         </a>
@@ -211,6 +238,20 @@
                         <a href="/appointment" class="nav-link">
                             <i class="icon-calendar5"></i>
                             <span>Randevu İstekleri</span>
+                            @{
+
+                                var userId = Convert.ToInt32(Session["userId"]);
+                                var tchId = _db.Users.FirstOrDefault(x => x.ID == userId)?.TeacherId;
+
+                                if (tchId != null)
+                                {
+                                    var appo = _db.Appointment.Count(x => x.TeacherId == tchId && x.Status == "Onay Bekleniyor");
+                                    if (appo > 0)
+                                    {
+                                        <span class="badge badge-pill bg-blue ml-auto">@appo</span>
+                                    }
+                                }
+                            }
                         </a>
                     </li>
 
@@ -266,6 +307,18 @@
                         <a href="/appointment" class="nav-link">
                             <i class="icon-calendar5"></i>
                             <span>Randevu Yönetimi</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/absenteeism" class="nav-link">
+                            <i class="icon-calendar52"></i>
+                            <span>Devamsızlık Yönetimi</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/exam" class="nav-link">
+                            <i class="icon-pen2"></i>
+                            <span>Not Yönetimi</span>
                         </a>
                     </li>
                     <li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Yönetim</div> <i class="icon-menu" title="Yönetim"></i></li>

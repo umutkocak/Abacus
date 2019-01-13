@@ -61,17 +61,29 @@
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="MiniProfiler.EF6, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
+      <HintPath>..\packages\MiniProfiler.EF6.4.0.138\lib\net461\MiniProfiler.EF6.dll</HintPath>
+    </Reference>
+    <Reference Include="MiniProfiler.Shared, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
+      <HintPath>..\packages\MiniProfiler.Shared.4.0.138\lib\net461\MiniProfiler.Shared.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.3.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.5.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -134,7 +146,13 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Absenteeism.cs">
+      <DependentUpon>OBSModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Announcements.cs">
+      <DependentUpon>OBSModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Appointment.cs">
       <DependentUpon>OBSModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Classes.cs">
@@ -186,9 +204,12 @@
       <DependentUpon>OBSModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\AbsenteeismViewModel.cs" />
     <Compile Include="ViewModels\AnnouncementViewModel.cs" />
+    <Compile Include="ViewModels\AppointmentViewModel.cs" />
     <Compile Include="ViewModels\ClassScheduleViewModel.cs" />
     <Compile Include="ViewModels\ClassViewModel.cs" />
+    <Compile Include="ViewModels\ExamViewModel.cs" />
     <Compile Include="ViewModels\HomeWorkViewModel.cs" />
     <Compile Include="ViewModels\StatisticsViewModel.cs" />
     <Compile Include="ViewModels\TeacherViewModel.cs" />
@@ -223,6 +244,27 @@
     <Content Include="Content\assets\demo_data\wizard\education.html" />
     <Content Include="Content\assets\demo_data\wizard\experience.html" />
     <Content Include="Content\assets\demo_data\wizard\personal_data.html" />
+    <Content Include="Content\assets\gijgo\css\gijgo.css" />
+    <Content Include="Content\assets\gijgo\css\gijgo.min.css" />
+    <Content Include="Content\assets\gijgo\fonts\gijgo-material.svg" />
+    <Content Include="Content\assets\gijgo\js\gijgo.js" />
+    <Content Include="Content\assets\gijgo\js\gijgo.min.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.bg-bg.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.bg-bg.min.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.de-de.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.de-de.min.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.es-es.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.es-es.min.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.fr-fr.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.fr-fr.min.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.it-it.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.it-it.min.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.pt-br.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.pt-br.min.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.ru-ru.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.ru-ru.min.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.tr-tr.js" />
+    <Content Include="Content\assets\gijgo\js\messages\messages.tr-tr.min.js" />
     <Content Include="Content\assets\images\backgrounds\boxed_bg.png" />
     <Content Include="Content\assets\images\backgrounds\boxed_bg_retina.png" />
     <Content Include="Content\assets\images\backgrounds\panel_bg.png" />
@@ -266,6 +308,7 @@
     <Content Include="Content\assets\images\lang\ru.png" />
     <Content Include="Content\assets\images\lang\ua.png" />
     <Content Include="Content\assets\images\login_cover.jpg" />
+    <Content Include="Content\assets\images\login_cover2.jpg" />
     <Content Include="Content\assets\images\logo.png" />
     <Content Include="Content\assets\images\logo_dark.png" />
     <Content Include="Content\assets\images\logo_demo.png" />
@@ -2093,8 +2136,11 @@
     <Content Include="Content\bootstrap-grid.min.css" />
     <Content Include="Content\bootstrap-reboot.css" />
     <Content Include="Content\bootstrap-reboot.min.css" />
+    <Content Include="Content\bootstrap-theme.css" />
+    <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\mail\appointment.html" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -2687,6 +2733,11 @@
     <Content Include="Content\bootstrap-reboot.css.map" />
     <Content Include="Content\bootstrap-grid.min.css.map" />
     <Content Include="Content\bootstrap-grid.css.map" />
+    <Content Include="Content\assets\gijgo\fonts\gijgo-material.eot" />
+    <Content Include="Content\assets\gijgo\fonts\gijgo-material.ttf" />
+    <Content Include="Content\assets\gijgo\fonts\gijgo-material.woff" />
+    <Content Include="Content\bootstrap-theme.css.map" />
+    <Content Include="Content\bootstrap-theme.min.css.map" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
@@ -2724,6 +2775,133 @@
     <Content Include="Scripts\umd\popper-utils.min.js" />
     <Content Include="Scripts\umd\popper.js" />
     <Content Include="Scripts\umd\popper.min.js" />
+    <Content Include="Uploads\1.jpg" />
+    <Content Include="Uploads\10.jpg" />
+    <Content Include="Uploads\100.jpg" />
+    <Content Include="Uploads\101.jpg" />
+    <Content Include="Uploads\102.jpg" />
+    <Content Include="Uploads\103.jpg" />
+    <Content Include="Uploads\104.jpg" />
+    <Content Include="Uploads\105.jpg" />
+    <Content Include="Uploads\106.jpg" />
+    <Content Include="Uploads\107.jpg" />
+    <Content Include="Uploads\108.jpg" />
+    <Content Include="Uploads\109.jpg" />
+    <Content Include="Uploads\11.jpg" />
+    <Content Include="Uploads\110.jpg" />
+    <Content Include="Uploads\111.jpg" />
+    <Content Include="Uploads\112.jpg" />
+    <Content Include="Uploads\113.jpg" />
+    <Content Include="Uploads\114.jpg" />
+    <Content Include="Uploads\115.jpg" />
+    <Content Include="Uploads\116.jpg" />
+    <Content Include="Uploads\117.jpg" />
+    <Content Include="Uploads\118.jpg" />
+    <Content Include="Uploads\119.jpg" />
+    <Content Include="Uploads\12.jpg" />
+    <Content Include="Uploads\120.jpg" />
+    <Content Include="Uploads\127.jpg" />
+    <Content Include="Uploads\13.jpg" />
+    <Content Include="Uploads\14.jpg" />
+    <Content Include="Uploads\15.jpg" />
+    <Content Include="Uploads\16.jpg" />
+    <Content Include="Uploads\17.jpg" />
+    <Content Include="Uploads\18.jpg" />
+    <Content Include="Uploads\19.jpg" />
+    <Content Include="Uploads\2.jpg" />
+    <Content Include="Uploads\20.jpg" />
+    <Content Include="Uploads\21.jpg" />
+    <Content Include="Uploads\22.jpg" />
+    <Content Include="Uploads\23.jpg" />
+    <Content Include="Uploads\24.jpg" />
+    <Content Include="Uploads\25.jpg" />
+    <Content Include="Uploads\26.jpg" />
+    <Content Include="Uploads\27.jpg" />
+    <Content Include="Uploads\28.jpg" />
+    <Content Include="Uploads\29.jpg" />
+    <Content Include="Uploads\3.jpg" />
+    <Content Include="Uploads\30.jpg" />
+    <Content Include="Uploads\31.jpg" />
+    <Content Include="Uploads\32.jpg" />
+    <Content Include="Uploads\33.jpg" />
+    <Content Include="Uploads\34.jpg" />
+    <Content Include="Uploads\35.jpg" />
+    <Content Include="Uploads\36.jpg" />
+    <Content Include="Uploads\37.jpg" />
+    <Content Include="Uploads\38.jpg" />
+    <Content Include="Uploads\39.jpg" />
+    <Content Include="Uploads\4.jpg" />
+    <Content Include="Uploads\40.jpg" />
+    <Content Include="Uploads\41.jpg" />
+    <Content Include="Uploads\42.jpg" />
+    <Content Include="Uploads\43.jpg" />
+    <Content Include="Uploads\44.jpg" />
+    <Content Include="Uploads\45.jpg" />
+    <Content Include="Uploads\46.jpg" />
+    <Content Include="Uploads\47.jpg" />
+    <Content Include="Uploads\48.jpg" />
+    <Content Include="Uploads\49.jpg" />
+    <Content Include="Uploads\5.jpg" />
+    <Content Include="Uploads\50.jpg" />
+    <Content Include="Uploads\51.jpg" />
+    <Content Include="Uploads\52.jpg" />
+    <Content Include="Uploads\53.jpg" />
+    <Content Include="Uploads\54.jpg" />
+    <Content Include="Uploads\55.jpg" />
+    <Content Include="Uploads\56.jpg" />
+    <Content Include="Uploads\57.jpg" />
+    <Content Include="Uploads\58.jpg" />
+    <Content Include="Uploads\59.jpg" />
+    <Content Include="Uploads\6.jpg" />
+    <Content Include="Uploads\60.jpg" />
+    <Content Include="Uploads\61.jpg" />
+    <Content Include="Uploads\62.jpg" />
+    <Content Include="Uploads\63.jpg" />
+    <Content Include="Uploads\64.jpg" />
+    <Content Include="Uploads\65.jpg" />
+    <Content Include="Uploads\66.jpg" />
+    <Content Include="Uploads\67.jpg" />
+    <Content Include="Uploads\68.jpg" />
+    <Content Include="Uploads\69.jpg" />
+    <Content Include="Uploads\7.jpg" />
+    <Content Include="Uploads\70.jpg" />
+    <Content Include="Uploads\71.jpg" />
+    <Content Include="Uploads\72.jpg" />
+    <Content Include="Uploads\73.jpg" />
+    <Content Include="Uploads\74.jpg" />
+    <Content Include="Uploads\75.jpg" />
+    <Content Include="Uploads\76.jpg" />
+    <Content Include="Uploads\77.jpg" />
+    <Content Include="Uploads\78.jpg" />
+    <Content Include="Uploads\79.jpg" />
+    <Content Include="Uploads\8.jpg" />
+    <Content Include="Uploads\80.jpg" />
+    <Content Include="Uploads\81.jpg" />
+    <Content Include="Uploads\82.jpg" />
+    <Content Include="Uploads\83.jpg" />
+    <Content Include="Uploads\84.jpg" />
+    <Content Include="Uploads\85.jpg" />
+    <Content Include="Uploads\86.jpg" />
+    <Content Include="Uploads\87.jpg" />
+    <Content Include="Uploads\88.jpg" />
+    <Content Include="Uploads\89.jpg" />
+    <Content Include="Uploads\9.jpg" />
+    <Content Include="Uploads\90.jpg" />
+    <Content Include="Uploads\91.jpg" />
+    <Content Include="Uploads\92.jpg" />
+    <Content Include="Uploads\93.jpg" />
+    <Content Include="Uploads\94.jpg" />
+    <Content Include="Uploads\95.jpg" />
+    <Content Include="Uploads\96.jpg" />
+    <Content Include="Uploads\97.jpg" />
+    <Content Include="Uploads\98.jpg" />
+    <Content Include="Uploads\99.jpg" />
+    <Content Include="Uploads\default.png" />
+    <Content Include="Uploads\Doğuş Sinan Coşkun3.png" />
+    <Content Include="Uploads\IMG-20181230-WA0003.jpeg" />
+    <Content Include="Uploads\IMG_20161007_163545.jpg" />
+    <Content Include="Uploads\indir.jpg" />
+    <Content Include="Uploads\photo_2018-02-26_01-22-20.jpg" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -2766,10 +2944,13 @@
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\Home\HomeWork.cshtml" />
     <Content Include="Views\Home\Appointment.cshtml" />
+    <Content Include="Views\Home\Exam.cshtml" />
+    <Content Include="Uploads\PerformansÖdevi.docx" />
+    <Content Include="Uploads\Uygulama Tanıtımı.xlsx" />
+    <Content Include="Views\Home\Absenteeism.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Uploads\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

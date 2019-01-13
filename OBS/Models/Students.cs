@@ -22,13 +22,17 @@ public partial class Students
     public Students()
     {
 
+        this.Absenteeism = new HashSet<Absenteeism>();
+
+        this.Announcements = new HashSet<Announcements>();
+
+        this.Appointment = new HashSet<Appointment>();
+
         this.ClassStudents = new HashSet<ClassStudents>();
 
         this.Notes = new HashSet<Notes>();
 
         this.Users = new HashSet<Users>();
-
-        this.Announcements = new HashSet<Announcements>();
 
     }
 
@@ -36,6 +40,8 @@ public partial class Students
     public int ID { get; set; }
 
     public string TCNumber { get; set; }
+
+    public string StudentNumber { get; set; }
 
     public string FullName { get; set; }
 
@@ -45,9 +51,23 @@ public partial class Students
 
     public Nullable<System.DateTime> CreatedDate { get; set; }
 
-    public string StudentNumber { get; set; }
+    public string Parent { get; set; }
+
+    public string ParentNumber { get; set; }
 
 
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+
+    public virtual ICollection<Absenteeism> Absenteeism { get; set; }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+
+    public virtual ICollection<Announcements> Announcements { get; set; }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+
+    public virtual ICollection<Appointment> Appointment { get; set; }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 
@@ -60,10 +80,6 @@ public partial class Students
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 
     public virtual ICollection<Users> Users { get; set; }
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-
-    public virtual ICollection<Announcements> Announcements { get; set; }
 
 }
 

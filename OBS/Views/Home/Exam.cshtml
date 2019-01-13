@@ -1,0 +1,367 @@
+﻿@{
+    ViewBag.Title = "Sınav Notları - ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="card">
+    @if (Session["roleName"].ToString() != "Student")
+    {
+        <div class="card-header">
+            Not Yönetimi
+        </div>
+        <div class="card-body">
+
+            <div class="form-group row">
+                <div class="col-md-4">
+                    <label>Sınıfı Seç</label>
+                    <select id="ClassId" class="form-control select-fixed-single"></select>
+                </div>
+                <div class="col-md-4">
+                    <label>Dersi Seç</label>
+                    <select id="LessonId" disabled class="form-control select-fixed-single"></select>
+                </div>
+                <div class="col-md-4">
+                    <label>Dönemi Seç</label>
+                    <select id="Period" disabled class="form-control select-fixed-single">
+                        <option value="null">Dönem Seç</option>
+                        <option value="1">1.Dönem</option>
+                        <option value="2">2.Dönem</option>
+                    </select>
+                </div>
+            </div>
+
+
+            <hr class="block" />
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div id="tablo"></div>
+                        <table id="grid"></table>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    }
+    else
+    { <div class="card-header">
+            <h4>Notlarım</h4>
+        </div>
+        <div class="card-body">
+            <div class="form-group row">
+                <div class="col-md-4">
+                    <label>Dönemi Seç</label>
+                    <select id="Period" class="form-control select-fixed-single">
+                        <option value="1" selected="selected">1.Dönem</option>
+                        <option value="2">2.Dönem</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row" id="examGet">
+
+            </div>
+
+
+        </div>
+
+    }
+</div>
+
+
+@section scripts{
+   
+    @if (Session["roleName"].ToString() == "Teacher")
+    {
+        <script type="text/javascript">
+            $.select2Ajax.VeriCek("#ClassId", "/json/select2/teachers/class/" + @Session["userId"]);
+
+            $("#Period").select2();
+
+            $('#ClassId').change('select2:selecting',
+                function(e) {
+                    $("#LessonId").attr("disabled", false);
+                    $.select2Ajax.VeriCek("#LessonId", "/json/select2/class/" + $("#ClassId option:selected").val());
+                });
+
+            $("#LessonId").change('select2:selecting',
+                function(e) {
+                    $("#Period").attr("disabled", false);
+                });
+
+
+        </script>
+    }
+    else if (Session["roleName"].ToString() == "Admin")
+    {
+        <script type="text/javascript">
+            $.select2Ajax.VeriCek("#ClassId", "/json/select2/class/");
+
+            $("#Period").select2();
+
+            $('#ClassId').change('select2:selecting',
+                function(e) {
+                    $("#LessonId").attr("disabled", false);
+                    $.select2Ajax.VeriCek("#LessonId", "/json/select2/class/" + $("#ClassId option:selected").val());
+                });
+
+            $("#LessonId").change('select2:selecting',
+                function(e) {
+                    $("#Period").attr("disabled", false);
+                });
+        </script>
+    }
+
+    @if (Session["roleName"].ToString() != "Student")
+    {
+        <script type="text/javascript">
+            $(document).ready(function() {
+
+                var grid;
+
+
+                $("#Period").change('select2:selecting',
+                    function(e) {
+                        $('#grid').remove();
+                        $("#tablo").append("<table id='grid'></table>");
+                        var grid = $('#grid').grid({
+                            dataSource: {
+                                url: '/Home/Get',
+                                data: {
+                                    classId: $("#ClassId").val(),
+                                    lessonId: $("#LessonId").val(),
+                                    period: $("#Period").val()
+                                },
+                                method: 'GET'
+                            },
+                            locale: 'tr-tr',
+                            uiLibrary: 'bootstrap4',
+                            primaryKey: 'ID',
+                            autoLoad: true,
+                            inlineEditing: {
+                                mode: 'command',
+                                managementColumn: true,
+                                managementColumnConfig: { width: 70 }
+                            },
+                            columns: [
+                                { field: 'Student', title: "Öğrenci", width: 200 },
+                                { field: 'FirstNote', title: "1.Sınav", editor: true },
+                                { field: 'SecondNote', title: "2.Sınav", editor: true },
+                                { field: 'ThirdNote', title: "3.Sınav", editor: true },
+                                { field: 'ProjectNote', title: "Proje", editor: true },
+                                { field: 'VerbalNote', title: "Sözlü", editor: true },
+                                {
+                                    title: 'Ort',
+                                    renderer: function(value, record) {
+                                        return (parseInt(record.FirstNote) +
+                                                parseInt(record.SecondNote) +
+                                                parseInt(record.ThirdNote) +
+                                                parseInt(record.ProjectNote) +
+                                                parseInt(record.VerbalNote)) /
+                                            5;
+                                    }
+                                },
+                                {
+                                    title: 'Not',
+                                    renderer: function(value, record) {
+                                        var not = (parseInt(record.FirstNote) +
+                                                parseInt(record.SecondNote) +
+                                                parseInt(record.ThirdNote) +
+                                                parseInt(record.ProjectNote) +
+                                                parseInt(record.VerbalNote)) /
+                                            5;
+                                        if (not >= 85) {
+                                            return 5;
+                                        } else if (not <= 84 && not >= 70) {
+                                            return 4;
+                                        } else if (not <= 69 && not >= 50) {
+                                            return 3;
+                                        } else if (not <= 49 && not >= 50) {
+                                            return 2;
+                                        } else {
+                                            return 1;
+                                        }
+                                    }
+                                }
+                            ],
+
+                            pager: { limit: 10 }
+                        });
+
+                        grid.on('rowDataChanged',
+                            function(e, id, record) {
+                                // Clone the record in new object where you can format the data to format that is supported by the backend.
+                                var data = $.extend(true, {}, record);
+                                //// Format the date to format that is supported by the backend.
+                                //data.DateOfBirth = gj.core.parseDate(record.DateOfBirth, 'mm/dd/yyyy').toISOString();
+                                // Post the data to the server
+                                $.ajax({ url: '/Home/Save', data: { record: data }, method: 'POST' })
+                                    .fail(function() {
+                                        alert('Failed to save.');
+                                    });
+                            });
+                        grid.on('rowRemoving',
+                            function(e, $row, id, record) {
+                                $.iziToast.Info("Notlar silinemez");
+                            });
+
+
+                    });
+
+                $('input[type="text"].gj-width-full').prop('max',
+                    function() {
+                        return 100;
+                    });
+
+            });
+        </script>
+    }
+    else
+    {
+        <script type="text/javascript">
+
+            $("#Period").select2();
+
+            var exams = '<div class="col-md-4">' +
+                '<div class="card" style="zoom: 1;">' +
+                '<div class="card-header alpha-success text-success-800 header-elements-inline">' +
+                '<h6 class="card-title">Ders</h6>' +
+                '<div class="header-elements">' +
+                '</div>' +
+                '</div>' +
+                '' +
+                '<div class="table-responsive">' +
+                '<table class="table table-bordered">' +
+                '<thead>' +
+                '<tr>' +
+                '<th>Çalışma</th>' +
+                '<th>Not</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>' +
+                '<tr>' +
+                '<td>1.Sınav</td>' +
+                '<td>1.SinavNot</td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td>2.Sınav</td>' +
+                '<td>2.SinavNot</td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td>3.Sınav</td>' +
+                '<td>3.SinavNot</td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td>Sözlü</td>' +
+                '<td>SozluNot</td>' +
+                '</tr>' +
+                '<tr>' +
+                '<td>Performans</td>' +
+                '<td>PerformansNot</td>' +
+                '</tr>' +
+                '</tbody>' +
+                '</table>' +
+                '</div>' +
+                '<div class="list-group-item" style="background-color:#edeef0;">' +
+                '<div class="col-md-12 row">' +
+                '<div class="col-md-6 text-center">' +
+                '<strong>Ortalama</strong>' +
+                '</div>' +
+                '<div class="col-md-6 text-center">' +
+                '<strong>ORT</strong>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+
+            var list = [];
+            $('body').loading({
+                stoppable: true,
+                message: 'Notlarınız yükleniyor...'
+            });
+            $.getJSON('/exam/students/' + @Session["userId"] + '/' + $("#Period").val() + '',
+                function(json) {
+                    $.each(json,
+                        function(i, value) {
+                            for (var j = 0; j < value.length; j++) {
+                                var res;
+                                res = exams.replace("Ders", value[j].Lesson);
+                                res = res.replace("1.SinavNot", (value[j].FirstNote != null) ? value[j].FirstNote : "");
+                                res = res.replace("2.SinavNot", (value[j].SecondNote != null) ? value[j].SecondNote : "");
+                                res = res.replace("3.SinavNot", (value[j].ThirdNote != null) ? value[j].ThirdNote : "");
+                                res = res.replace("SozluNot", (value[j].VerbalNote != null) ? value[j].VerbalNote : "");
+                                res = res.replace("PerformansNot", (value[j].ProjectNote != null) ? value[j].ProjectNote : "");
+                                if (value[j].FirstNote != null &&
+                                    value[j].SecondNote != null &&
+                                    value[j].ThirdNote != null &&
+                                    value[j].VerbalNote != null &&
+                                    value[j].ProjectNote != null) {
+                                    res = res.replace("ORT",
+                                        (parseInt(value[j].FirstNote) +
+                                            parseInt(value[j].SecondNote) +
+                                            parseInt(value[j].ThirdNote) +
+                                            parseInt(value[j].ProjectNote) +
+                                            parseInt(value[j].VerbalNote)) /
+                                        5);
+                                } else {
+                                    res = res.replace("ORT", "Tüm notlarınız girilmedi");
+                                }
+
+                                list.push(res);
+                            }
+                        });
+                    $("#examGet").html(list.join(""));
+                    $('body').loading('stop');
+                });
+            $('body').loading('stop');
+
+            $("#Period").change('select2:selecting',
+                function(e) {
+                    $("#examGet").empty();
+                    $('body').loading({
+                        stoppable: true,
+                        message: 'Notlarınız yükleniyor...'
+                    });
+                    var list = [];
+                    $.getJSON('/exam/students/' + @Session["userId"] + '/' + $("#Period").val() + '',
+                        function(json) {
+                            $.each(json,
+                                function(i, value) {
+                                    for (var j = 0; j < value.length; j++) {
+                                        var res;
+                                        res = exams.replace("Ders", value[j].Lesson);
+                                        res = res.replace("1.SinavNot", (value[j].FirstNote != null) ? value[j].FirstNote : "");
+                                        res = res.replace("2.SinavNot", (value[j].SecondNote != null) ? value[j].SecondNote : "");
+                                        res = res.replace("3.SinavNot", (value[j].ThirdNote != null) ? value[j].ThirdNote : "");
+                                        res = res.replace("SozluNot", (value[j].VerbalNote != null) ? value[j].VerbalNote : "");
+                                        res = res.replace("PerformansNot", (value[j].ProjectNote != null) ? value[j].ProjectNote : "");
+                                        if (value[j].FirstNote != null &&
+                                            value[j].SecondNote != null &&
+                                            value[j].ThirdNote != null &&
+                                            value[j].VerbalNote != null &&
+                                            value[j].ProjectNote != null) {
+                                            res = res.replace("ORT",
+                                                (parseInt(value[j].FirstNote) +
+                                                    parseInt(value[j].SecondNote) +
+                                                    parseInt(value[j].ThirdNote) +
+                                                    parseInt(value[j].ProjectNote) +
+                                                    parseInt(value[j].VerbalNote)) /
+                                                5);
+                                        } else {
+                                            res = res.replace("ORT", "Tüm notlarınız girilmedi");
+                                        }
+
+                                        list.push(res);
+                                    }
+                                });
+                            $("#examGet").html(list.join(""));
+                            $('body').loading('stop');
+
+                        });
+
+                });
+        </script>
+    }
+}

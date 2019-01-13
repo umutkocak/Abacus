@@ -40,13 +40,7 @@ public partial class OBSEntities : DbContext
 
     public virtual DbSet<Lesson> Lesson { get; set; }
 
-    public virtual DbSet<Notes> Notes { get; set; }
-
     public virtual DbSet<Professions> Professions { get; set; }
-
-    public virtual DbSet<Users> Users { get; set; }
-
-    public virtual DbSet<Students> Students { get; set; }
 
     public virtual DbSet<Teachers> Teachers { get; set; }
 
@@ -55,6 +49,16 @@ public partial class OBSEntities : DbContext
     public virtual DbSet<Announcements> Announcements { get; set; }
 
     public virtual DbSet<HomeWork> HomeWork { get; set; }
+
+    public virtual DbSet<Appointment> Appointment { get; set; }
+
+    public virtual DbSet<Notes> Notes { get; set; }
+
+    public virtual DbSet<Users> Users { get; set; }
+
+    public virtual DbSet<Absenteeism> Absenteeism { get; set; }
+
+    public virtual DbSet<Students> Students { get; set; }
 
 }
 

@@ -34,7 +34,9 @@ public partial class Notes
 
     public Nullable<int> StudentId { get; set; }
 
-    public Nullable<int> TeacherId { get; set; }
+    public Nullable<int> LessonId { get; set; }
+
+    public Nullable<int> Period { get; set; }
 
     public Nullable<System.DateTime> CreatedDate { get; set; }
 
@@ -42,9 +44,9 @@ public partial class Notes
 
     public virtual Classes Classes { get; set; }
 
-    public virtual Students Students { get; set; }
+    public virtual Lesson Lesson { get; set; }
 
-    public virtual Teachers Teachers { get; set; }
+    public virtual Students Students { get; set; }
 
 }
 

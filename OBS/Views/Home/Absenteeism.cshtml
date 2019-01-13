@@ -1,0 +1,458 @@
+﻿@using OBS.Models
+@{
+    ViewBag.Status = "Devamsızlık - ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row" ng-app="">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header header-elements-inline">
+                <h5 class="card-title">Devamsızlık Takvimi</h5>
+            </div>
+            @if (Session["roleName"] != null && Session["roleName"] == "Student")
+            {
+                {
+                     OBSEntities _db = new OBSEntities();
+                     var id = Convert.ToInt32(Session["userId"]);
+                     var stdId = _db.Users.FirstOrDefault(x => x.ID == id)?.StudentId;
+                     var data = _db.Absenteeism.Where(x => x.StudentId == stdId).ToList();
+                     var izinliGun = Convert.ToDouble(data.Count(x => x.Status == "İzinli"));
+                     double toplamIzin = Convert.ToDouble(izinliGun + Convert.ToDouble(data.Count(x => x.Status == "Nöbetçi")));
+                     double yarimGun = (Convert.ToDouble(data.Count(x => x.Status == "Yarım Gün")) / 2);
+                    double toplamDevamsizlik = Convert.ToDouble(yarimGun + Convert.ToDouble(data.Count(x => x.Status == "Tam Gün")));
+               
+
+                    <div class="row m-lg-1">
+                        <div class="col-lg-6">
+                            <div class="alert alert-primary alert-styled-left alert-dismissible">
+                                <span class="font-weight-semibold">İzinli Gün Sayısı: </span> @toplamIzin
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="alert alert-warning alert-styled-left alert-dismissible">
+                                <span class="font-weight-semibold">Toplam Devamsızlık: </span> @toplamDevamsizlik
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            }
+         
+
+        
+
+            <div class="card-body">
+                <div id="calender"></div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+
+<div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="true" style="z-index: 1050; display: none;" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <form id="form">
+                <div class="modal-body">
+
+                    <p id="pDetails"></p>
+
+                    @if (Session["roleName"] != null && Session["roleName"].ToString() == "Teacher")
+                    {
+                        <button id="btnDelete" class="btn btn-default btn-sm pull-right">
+                            <span class="glyphicon glyphicon-remove"></span> Sil
+                        </button>
+                        <button id="btnEdit" class="btn btn-default btn-sm pull-right" style="margin-right:5px;">
+                            <span class="glyphicon glyphicon-pencil"></span> Düzenle
+                        </button>
+                    }
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@if (Session["roleName"] != null && Session["roleName"].ToString() == "Teacher")
+{
+    <div id="myModalSave" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="true" style="z-index: 1050; display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Devamsızlık Ekle</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <form class="form-horizontal">
+                    <div class="modal-body">
+                        <input type="hidden" id="ID" />
+                        <div class="form-group">
+                            <label>Öğrenciler</label>
+                            <select id="StudentId" multiple="multiple" class="form-control select-fixed-single"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Devamsızlık Tarihi</label>
+                            <div class="input-group date" id="dtp1">
+                                <input id="txtStart" class="form-control" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>İşlem</label>
+                            <select id="islem" class="form-control" required>
+                                <option value="Yarım Gün">Yarım Gün</option>
+                                <option value="Tam Gün">Tam Gün</option>
+                                <option value="İzinli">İzinli</option>
+                                <option value="Nöbetçi">Nöbetçi</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                        <button type="submit" id="btnSave" class="btn btn-success">Kaydet</button>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+@section Scripts{
+    <script src="/Content/assets/js/plugins/ui/moment/moment.min.js"></script>
+    <script src="/Content/assets/js/plugins/ui/fullcalendar/fullcalendar.min.js"></script>
+    <script src="/Content/assets/js/plugins/ui/fullcalendar/lang/tr.js"></script>
+
+    @if (Session["roleName"] != null && Session["roleName"].ToString() == "Student")
+    {
+        <script>
+
+            var events = [];
+            var selectedEvent = null;
+            fetchEventAndRenderCalendar();
+
+            function fetchEventAndRenderCalendar() {
+                events = [];
+                $.getJSON('/json/absenteeism/' + @Session["userId"],
+                    function (json) {
+                        $.each(json,
+                            function (i, v) {
+                                for (var j = 0; j < v.length; j++) {
+                                    var data = new Object();
+                                    if (v[j].Status === "Yarım Gün") {
+                                        data.color = "Orange";
+                                    } else if (v[j].Status === "Tam Gün") {
+                                        data.color = "Red";
+                                    } else if (v[j].Status === "İzinli") {
+                                        data.color = "Navy Blue";
+                                    } else if (v[j].Status === "Nöbetçi") {
+                                        data.color = "Gray";
+                                    }
+                                    data.ID = v[j].ID;
+                                    data.title = v[j].StudentNumber + " - " + v[j].Status;
+                                    data.description = v[j].Status;
+                                    data.start = window.moment(v[j].Date);
+                                    data.allDay = v[j].IsFullDay;
+                                    data.Student = v[j].Student;
+                                    data.StudentId = v[j].StudentId;
+                                    data.StudentNumber = v[j].StudentNumber;
+                                    events.push(data);
+                                }
+                                generateCalender(events);
+                            });
+                    });
+            }
+
+            function generateCalender(events) {
+                $('#calender').fullCalendar('destroy');
+                $('#calender').fullCalendar({
+                    contentHeight: 600,
+                    defaultView: 'month',
+                    defaultDate: new Date(),
+                    locale: 'tr',
+                    hiddenDays: [0, 6],
+                    timeFormat: 'h(:mm)a',
+                    header: {
+                        right: 'prev,next',
+                        center: 'Status'
+                    },
+                    eventLimit: true,
+                    eventColor: '#378006',
+                    events: events,
+                    eventClick: function (calEvent, jsEvent, view) {
+                        selectedEvent = calEvent;
+                        $('.modal-title').html(calEvent.title);
+                        var $description = $('<div/>');
+                        $description.append($('<p/>')
+                            .html('<b>İşlem Tarihi: </b>' + calEvent.start.format("DD MMMM YYYY")));
+                        $description.append($('<p/>').html('<b>Açıklama: </b>' + calEvent.description));
+                        $description.append($('<p/>').html('<b>Öğrenci: </b>' + calEvent.Student));
+                        $('#myModal #pDetails').empty().html($description);
+                        $('#myModal').modal();
+                    },
+                    selectable: false,
+                    editable: false
+                });
+            }
+
+        </script>
+    }
+    else
+    {
+        <script>
+        $(document).ready(function () {
+
+            $.select2Ajax.VeriCek("#StudentId", "json/select2/teachers/class/student/" + '@Session["userId"]');
+            $("#islem").select2();
+
+            $('#txtStart').datepicker({
+                //minDate: function() {
+                //    var date = new Date();
+                //    date.setDate(date.getDate()-1);
+                //    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                //},
+                disableDaysOfWeek: [5, 6],
+                format: 'dd/mm/yyyy',
+                locale: 'tr-tr',
+                uiLibrary: 'bootstrap4',
+                value: function () {
+                    var date = new Date();
+                    date.setDate(date.getDate() - 1);
+                    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                }
+            });
+
+
+            var events = [];
+            var selectedEvent = null;
+            fetchEventAndRenderCalendar();
+
+            function fetchEventAndRenderCalendar() {
+                events = [];
+                $.getJSON('/json/absenteeism/' + @Session["userId"],
+                    function (json) {
+                        $.each(json,
+                            function (i, v) {
+                                for (var j = 0; j < v.length; j++) {
+                                    var data = new Object();
+                                    if (v[j].Status === "Yarım Gün") {
+                                        data.color = "Orange";
+                                    } else if (v[j].Status === "Tam Gün") {
+                                        data.color = "Red";
+                                    } else if (v[j].Status === "İzinli") {
+                                        data.color = "Navy Blue";
+                                    } else if (v[j].Status === "Nöbetçi") {
+                                        data.color = "Gray";
+                                    }
+                                    data.ID = v[j].ID;
+                                    data.title = v[j].StudentNumber + " - " +v[j].Status ;
+                                    data.description = v[j].Status;
+                                    data.start = window.moment(v[j].Date);
+                                    data.allDay = v[j].IsFullDay;
+                                    data.Student = v[j].Student;
+                                    data.StudentId = v[j].StudentId;
+                                    data.StudentNumber = v[j].StudentNumber;
+                                    events.push(data);
+                                }
+                                generateCalender(events);
+                            });
+                    });
+
+            }
+
+            function generateCalender(events) {
+                $('#calender').fullCalendar('destroy');
+                $('#calender').fullCalendar({
+                    contentHeight: 600,
+                    defaultView: 'month',
+                    defaultDate: new Date(),
+                    locale: 'tr',
+                    hiddenDays: [0, 6],
+                    timeFormat: 'h(:mm)a',
+                    header: {
+                        right: 'prev,next',
+                        center: 'Status'
+                    },
+                    eventLimit: true,
+                    eventColor: '#378006',
+                    events: events,
+                    eventClick: function (calEvent, jsEvent, view) {
+                        selectedEvent = calEvent;
+                        $('.modal-title').html(calEvent.title);
+                        var $description = $('<div/>');
+                        $description.append($('<p/>')
+                            .html('<b>İşlem Tarihi: </b>' + calEvent.start.format("DD MMMM YYYY")));
+                        $description.append($('<p/>').html('<b>Açıklama: </b>' + calEvent.description));
+                        $description.append($('<p/>').html('<b>Öğrenci: </b>' + calEvent.Student));
+                        $('#myModal #pDetails').empty().html($description);
+                        $('#myModal').modal();
+                    },
+                    selectable: true,
+                    select: function (start, end) {
+                        selectedEvent = {
+                            ID: 0,
+                            Status: '',
+                            description: '',
+                            start: start,
+                            end: end,
+                            allDay: false,
+                            color: ''
+                        };
+                        openAddForm();
+                        $('#calendar').fullCalendar('unselect');
+                    },
+                    editable: true,
+                    eventDrop: function (event) {
+                        var data = {
+                            ID: event.ID,
+                            Subject: event.Status,
+                            Start: event.start.format('DD/MM/YYYY HH:mm A'),
+                            End: event.end != null ? event.end.format('DD/MM/YYYY HH:mm A') : null,
+                            Description: event.description,
+                            ThemeColor: event.color,
+                            IsFullDay: event.allDay
+                        };
+                        SaveEvent(data);
+                    }
+                });
+            }
+
+            $('#btnEdit').click(function (e) {
+                e.preventDefault();
+                //Open modal dialog for edit event
+                openAddEditForm();
+            });
+
+
+            $('#btnDelete').click(function (e) {
+                e.preventDefault();
+                if (selectedEvent != null) {
+                    $('#myModal').modal('hide');
+                    iziToast.question({
+                        timeout: 20000,
+                        close: false,
+                        overlay: true,
+                        displayMode: 'once',
+                        id: 'question',
+                        zindex: 999,
+                        title: 'Dikkat',
+                        message: 'Silmek istediğinize emin misiniz?',
+                        position: 'center',
+                        buttons: [
+                            [
+                                '<button><b>Evet</b></button>', function (instance, toast) {
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '/absenteeism/delete/' + selectedEvent.ID,
+                                        success: function (data) {
+                                            if (data === "Success") {
+                                                $.iziToast.Success();
+                                                fetchEventAndRenderCalendar();
+                                            }
+                                        },
+                                        error: function () {
+                                            $.iziToast.Warning();
+                                        }
+                                    });
+                                    instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                                }, true
+                            ],
+                            [
+                                '<button>Hayır</button>', function (instance, toast) {
+
+                                    instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                                }
+                            ]
+                        ]
+                    });
+                }
+            });
+
+
+            function openAddForm() {
+                if (selectedEvent != null) {
+                    $("#form")[0].reset();
+                    $('#StudentId').val("Yarım Gün").trigger('change');
+                    $('#txtStart').val(selectedEvent.start.format('DD/MM/YYYY'));
+                    $("#StudentId").attr("disabled", false);
+                }
+                $('#myModal').modal('hide');
+                $('#myModalSave').modal('show');
+            }
+            function openAddEditForm() {
+                if (selectedEvent != null) {
+                    $("#form")[0].reset();
+                    $('#StudentId').val(null).trigger('change');
+                    $('#ID').val(selectedEvent.ID);
+                    $('#txtStart').val(selectedEvent.start.format('DD/MM/YYYY'));
+                    $("#StudentId").select2("trigger", "select", { data: { text: selectedEvent.Student, id: selectedEvent.StudentId } });
+                    $("#islem").val(selectedEvent.description).trigger('change');
+                    $("#StudentId").attr("disabled", true);
+                }
+                $('#myModal').modal('hide');
+                $('#myModalSave').modal('show');
+            }
+
+            $('#btnSave').click(function (e) {
+                //Validation/
+                e.preventDefault();
+                if ($('#StudentId').val() <= 0) {
+                    $.iziToast.Info("Lütfen öğrenci seçiniz.");
+                    return;
+                }
+
+                var data = {
+                    ID: $('#ID').val(),
+                    Date: $("#txtStart").val().trim(),
+                    Status: $("#islem").val(),
+                    StudentId: $("#StudentId").val().toString().split(",")
+                }
+                SaveEvent(data);
+                // call function for submit data to the server
+            });
+
+            function SaveEvent(data) {
+                $.ajax({
+                    type: "POST",
+                    url: '/absenteeism/add',
+                    data: JSON.stringify({ abs: data, std: $("#StudentId").val().toString().split(",") }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data === "Success") {
+                            fetchEventAndRenderCalendar();
+                            $.iziToast.Success();
+                            $('#myModalSave').modal('hide');
+                        }
+                    },
+                    error: function () {
+                        $.iziToast.Warning();
+                    }
+                });
+            }
+        })
+        </script>
+    }
+
+
+}

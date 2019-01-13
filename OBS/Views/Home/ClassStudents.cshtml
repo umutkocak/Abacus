@@ -72,18 +72,18 @@
                         '<td colspan="8"><b><i class="icon-books"></i> Öğrenciler ' +
                         '</b></td>' +
                         '<tr>' +
-                        '<th>' +
+                        '<th width="7%">' +
                         'Resim' +
-                        '</th>' +
-                        '<th>' +
-                        'TC Kimlik Numarası' +
                         '</th>' + '<th>' +
                         'Öğrenci' +
-                        '</th>' + '<th>' +
+                        '</th width="10%">' + '<th>' +
                         'Öğrenci Numarası' +
-                        '</th>' + '<th>' +
-                        'Doğum Tarihi' +
                         '</th>' +
+                        '<th>' +
+                        'Veli' +
+                    '</th>' + '<th>' +
+                    'Veli Cep Tel.' +
+                    '</th>' +
                         '</tr>';
                     for (var i = 0; i < d.Students.length; i++) {
 
@@ -93,17 +93,16 @@
                             d.Students[i].Image +
                             '" class="rounded-circle" width="40" height="40"> </td>' +
                             '<td>' +
-                            d.Students[i].TCNumber +
-                            '</td>' +
-                            '<td>' +
                             d.Students[i].FullName +
                             '</td>' +
                             '<td>' +
                             d.Students[i].StudentNumber +
                             '</td>' +
                             '<td>' +
-                            new Date(parseInt(d.Students[i].Birthday.substr(6))).format("dd/mm/yyyy") +
-                            '</td>' +
+                            d.Students[i].Parent +
+                        '</td>' + '<td>' +
+                        d.Students[i].ParentNumber +
+                        '</td>' +
                             '</tr>';
                     }
                     tableHTML += '</table>';
@@ -132,34 +131,34 @@
                     { "width": "2%", "title": "#ID", "data": "ID" },
                     { "title": "Sınıf Adı", "data": "ClassName", "autoWidth": true },
                     { "title": "Sınıf Öğretmeni", "data": "Teacher", "autoWidth": true },
-                    { "title": "Sınıf Dersleri", "data": "Lessons[,].LessonName", "autoWidth": true },
-                    {
-                        "title": "Seçenekler",
-                        "data": "ID",
-                        "width": "5%",
-                        "searchable": true,
-                        "sortable": true,
-                        "processing": true,
-                        "serverSide": true,
-                        "render": function (data, type, full, meta) {
-                            return '<div class="list-icons">' +
-                                '										<div class="dropdown">' +
-                                '											<a href="#" class="list-icons-item" data-toggle="dropdown" aria-expanded="false">' +
-                                '												<i class="icon-menu9"></i>' +
-                                '											</a>' +
-                                '' +
-                                '											<div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-158px, 19px, 0px); top: 0px; left: 0px; will-change: transform;">' +
-                                '												<a href="#" data-id=' +
-                                data +
-                                ' class="update-link dropdown-item"><i class="icon-pen6"></i> Düzenle</a>' +
-                                '												<a href="#" data-id=' +
-                                data +
-                                ' class="delete-link dropdown-item"><i class="icon-trash"></i> Sil</a>' +
-                                '											</div>' +
-                                '										</div>' +
-                                '									</div>';
-                        }
-                    }
+                    { "title": "Sınıf Dersleri", "data": "Lessons[,].LessonName", "autoWidth": true }
+                    //{
+                    //    "title": "Seçenekler",
+                    //    "data": "ID",
+                    //    "width": "5%",
+                    //    "searchable": true,
+                    //    "sortable": true,
+                    //    "processing": true,
+                    //    "serverSide": true,
+                    //    "render": function (data, type, full, meta) {
+                    //        return '<div class="list-icons">' +
+                    //            '										<div class="dropdown">' +
+                    //            '											<a href="#" class="list-icons-item" data-toggle="dropdown" aria-expanded="false">' +
+                    //            '												<i class="icon-menu9"></i>' +
+                    //            '											</a>' +
+                    //            '' +
+                    //            '											<div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(-158px, 19px, 0px); top: 0px; left: 0px; will-change: transform;">' +
+                    //            '												<a href="#" data-id=' +
+                    //            data +
+                    //            ' class="update-link dropdown-item"><i class="icon-pen6"></i> Düzenle</a>' +
+                    //            '												<a href="#" data-id=' +
+                    //            data +
+                    //            ' class="delete-link dropdown-item"><i class="icon-trash"></i> Sil</a>' +
+                    //            '											</div>' +
+                    //            '										</div>' +
+                    //            '									</div>';
+                    //    }
+                    //}
                 ],
                 autoWidth: false,
                 dom:

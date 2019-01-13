@@ -1,4 +1,5 @@
-﻿@{
+﻿@using OBS.Models
+@{
     ViewBag.Title = "Randevu - ";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -11,6 +12,72 @@
                 <h5 class="card-title">Randevular</h5>
             </div>
             @if (Session["roleName"].ToString() != "Student")
+            {
+                <div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="true" style="z-index: 1050; display: none;" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Yeni Randevu İsteği</h5>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <form id="form">
+                                <div class="modal-body">
+                                    <input type="text" id="ID" hidden="" class="form-control">
+                                    <input type="text" id="StudentId" hidden="" class="form-control">
+
+                                    <div class="form-group">
+                                        <label>Öğretmen</label>
+                                        <select id="TeacherId" class="form-control select-fixed-single" disabled="disabled"></select>
+                                    </div>
+
+                                    <div class="card border-success">
+                                        <div class="card-header alpha-success border-success d-flex justify-content-between">
+                                            <span class="font-size-sm text-uppercase font-weight-semibold" id="std">Umut Koçak</span>
+                                            <span class="font-size-sm text-uppercase text-success-700 font-weight-semibold" id="createdDate">Yollama Tarihi:</span>
+                                        </div>
+                                        <div class="card-body">
+                                            <p id="stdMessage" class="card-text">Hocam Selam bana not lazım</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Öğretmen Mesajı</label>
+                                        <textarea id="TeacherMessage" name="editordata"></textarea>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-4">
+                                            <label>Durumu</label>
+                                            <select class="js-example-basic-single form-control" id="Status">
+                                                <option value="null">Seçiniz</option>
+                                                <option value="Onay Bekleniyor">Onay Bekliyor</option>
+                                                <option value="Kabul">Kabul Edildi</option>
+                                                <option value="Red">Reddedildi</option>
+                                                <option value="Kapat">Kapandı</option>
+
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>Tarihi</label>
+                                            <input type="date" id="Date" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>Saati</label>
+                                            <input type="text" id="Time" class="form-control" placeholder="Saati" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                                    <button type="submit" class="btn btn-primary">Kaydet <i class="icon-database-check ml-2"></i></button>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
             {
 
                 <div class="card-body">
@@ -37,7 +104,7 @@
 
                                     <div class="form-group">
                                         <label>Mesajınız</label>
-                                        <textarea id="summernote" name="editordata"></textarea>
+                                        <textarea id="StudentMessage" name="editordata"></textarea>
                                     </div>
 
                                 </div>
@@ -50,12 +117,10 @@
                         </div>
                     </div>
                 </div>
-            }
-
-            <!-- Vertical form modal -->
+            }<!-- Vertical form modal -->
             <!-- /vertical form modal -->
 
-            <table id="examples" class="table" style="width: 100%"></table>
+            <table id="examples" class="table datatable-responsive" style="width: 100%"></table>
 
 
 
@@ -69,13 +134,14 @@
 
 
 @section scripts{
-    @*$(elem).prop('selectedIndex', 1).change();*@
-    <script>
 
-        $(document).ready(function() {
+
+    <script>
+        $(document).ready(function () {
+
             $('#myModal').on('shown.bs.modal',
-                function() {
-                    $('#summernote').summernote({
+                function () {
+                    $('#TeacherMessage').summernote({
                         tabsize: 2,
                         height: 100,
                         lang: 'tr-TR',
@@ -85,6 +151,486 @@
                         ]
                     });
                 });
+
+            $('#myModal').on('shown.bs.modal',
+                function () {
+                    $('#StudentMessage').summernote({
+                        tabsize: 2,
+                        height: 100,
+                        lang: 'tr-TR',
+                        toolbar: [
+                            ['style', ['bold', 'italic', 'underline', 'clear']],
+                            ['color', ['color']]
+                        ]
+                    });
+                });
+
+            $.select2Ajax.VeriCek("#TeacherId", "/json/select2/teachers");
+            $('#Status').select2({
+                placeholder: "Durumu Seçin"
+            });
+            function formClear() {
+                $("#form")[0].reset();
+                $(".modal-title").html("Randevu İsteği");
+                $('#StudentMessage').summernote('code', '');
+                $('#TeacherMessage').summernote('code', '');
+                $("#TeacherID").val(null).trigger('change');
+                $('[type="date"]').prop('min', function () {
+                    return new Date().toJSON().split('T')[0];
+                });
+            };
+
+            $("#add").click(function () {
+                formClear();
+            });
+
+
+            $("form").submit(function (e) {
+                e.preventDefault();
+
+                var data = new Object();
+
+                if ($('#ID').val().length >= 1) {
+                    data.ID = $('#ID').val();
+                }
+                data.TeacherId = $('#TeacherId').val();
+                data.StudentId = $("#StudentId").val();
+                if ($("#TeacherMessage").val() != null) {
+                    data.TeacherMessage = $("#TeacherMessage").val();
+                }
+                if ($("#StudentMessage").val() != null) {
+                    data.StudentMessage = $("#StudentMessage").val();
+                }
+                if ($("#Date").val() != null) {
+                    data.Date = $("#Date").val();
+                }
+                if ($("#Time").val() != null) {
+                    data.Time = $("#Time").val();
+                }
+                if ($("#Status").val() != null) {
+                    data.Status = $("#Status").val();
+                } else {
+                    data.Status = "Onay Bekleniyor";
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "/appointment/add",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response === "Success") {
+                            $.iziToast.Success();
+                            $("#examples").DataTable().ajax.reload();
+                            $("#myModal").modal('hide');
+                        } else if (response === "Update") {
+                            $.iziToast.Success();
+                            $("#examples").DataTable().ajax.reload();
+                            $("#myModal").modal('hide');
+                        } else if (response === "NoChanges") {
+                            $.iziToast.Info("Herhangi bir değişiklik yapılmadı.");
+                        } else if (response === "Saved") {
+                            $.iziToast.Info("Bu istek daha önce kabul edildi. Sadece kapatabilirsiniz.");
+                        } else {
+                            $.iziToast.Warning();
+                            alert(response);
+                        }
+                    },
+                    failure: function (response) {
+                        alert(response.responseText);
+                    },
+                    error: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+
+            });
         });
     </script>
+
+
+    @if (Session["roleName"].ToString() == "Student")
+    {
+        <script src="~/Content/assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+
+
+        OBSEntities _db = new OBSEntities();
+        var className = Session["ClassName"].ToString();
+        var classTeacher = _db.Classes.FirstOrDefault(x => x.ClassName == className);
+        var teacherInfo = _db.Teachers.First(x => x.ID == classTeacher.TeacherID);
+
+        <script>
+            $(document).ready(function() {
+                $("#TeacherId").select2("trigger", "select", { data: { text: "@teacherInfo.FullName", id: "@teacherInfo.ID" } });
+
+                $('#examples').DataTable({
+                    "ajax": {
+                        "url": "/json/appointment/" + @Session["userId"],
+                        "type": "GET",
+                        "datatype": "json"
+                    },
+                    "paging": false,
+                    responsive: true,
+                    "columns": [
+                        { "width": "2%", "title": "#ID", "data": "ID" },
+                        {
+                            "title": "İstek Tarihi",
+                            "data": "CreatedDate",
+                            "autoWidth": true,
+                            "searchable": true,
+                            "sortable": true,
+                            "processing": true,
+                            "serverSide": true,
+                            "render": function (data, type, full, meta) {
+                                return new Date(parseInt(full.CreatedDate.substr(6))).format("dd.mm.yyyy");
+                            }
+                        },
+                        { "autoWidth": true, "title": "Öğretmen", "data": "Teacher" },
+                        {
+                            "title": "Randevu Durumu",
+                            "data": "Status",
+                            "autoWidth": true,
+                            "searchable": true,
+                            "sortable": true,
+                            "processing": true,
+                            "serverSide": true,
+                            "render": function (data, type, full, meta) {
+                                if (data === "Onay Bekleniyor") {
+                                    return '<span class="badge badge-info d-block">Onay Bekliyor</span>';
+                                } else if (data === "Kabul") {
+                                    return '<span class="badge badge-success d-block">Kabul Edildi</span>';
+                                } else if (data === "Red") {
+                                    return '<span class="badge badge-danger d-block">Reddedildi</span>';
+                                } else {
+                                    return "";
+                                }
+                            }
+                        }
+                    ],
+                    columnDefs: [{
+                        width: 100
+                    }],
+                    dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+                    "language":
+                    {
+                        "url":
+                            "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json"
+                    }
+                });
+            });
+        </script>
+    }
+    else if (Session["roleName"].ToString() == "Teacher")
+    {
+        <script>
+            $(document).ready(function() {
+
+                $('#examples').DataTable({
+                    "ajax": {
+                        "url": "/json/appointment/" + @Session["userId"],
+                        "type": "GET",
+                        "datatype": "json"
+                    },
+                    "paging": false,
+                    responsive: true,
+                    "columns": [
+                        { "width": "2%", "title": "#ID", "data": "ID" },
+                        {
+                            "title": "İstek Tarihi",
+                            "data": "CreatedDate",
+                            "autoWidth": true,
+                            "searchable": true,
+                            "sortable": true,
+                            "processing": true,
+                            "serverSide": true,
+                            "render": function(data, type, full, meta) {
+                                return new Date(parseInt(full.CreatedDate.substr(6))).format("dd.mm.yyyy");
+                            }
+                        },
+                        { "autoWidth": true, "title": "Öğrenci", "data": "Student" },
+                        {
+                            "title": "Randevu Durumu",
+                            "data": "Status",
+                            "autoWidth": true,
+                            "searchable": true,
+                            "sortable": true,
+                            "processing": true,
+                            "serverSide": true,
+                            "render": function(data, type, full, meta) {
+                                if (data === "Onay Bekleniyor") {
+                                    return '<span class="badge badge-info d-block">Onay Bekliyor</span>';
+                                } else if (data === "Kabul") {
+                                    return '<span class="badge badge-success d-block">Kabul Edildi</span>';
+                                } else if (data === "Red") {
+                                    return '<span class="badge badge-danger d-block">Reddedildi</span>';
+                                } else if (data === "Kapat") {
+                                    return '<span class="badge badge-warning d-block">Kapandı</span>';
+                                } else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+
+                            "render": function (data, type, full, meta) {
+                                if (full.Status === "Onay Bekleniyor") {
+                                    return '<a class="update-link badge badge-success d-block" href="#" data-id='+full.ID+'><i class="icon-pen6"></i> Yanıtla</a>';
+                                } else if (full.Status === "Onay Bekleniyor") {
+                                    return '<a class="update-link badge badge-success d-block" href="#" data-id='+full.ID+'><i class="icon-pen6"></i> Düzenle</a>';
+                                } else if (full.Status === "Kapat" || full.Status === "Red") {
+                                    return '<a class="update-link badge badge-success d-block" href="#" data-id='+full.ID+'><i class="icon-eye"></i> Görüntüle </a>';
+                                }else {
+                                    return null;
+                                }
+                            }
+                        }
+                    ],
+                    columnDefs: [{
+                        width: 100
+                    }],
+                    dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+                    "language":
+                    {
+                        "url":
+                            "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json"
+                    }
+                });
+
+
+
+                $('#examples tbody').on('click',
+                    'a.update-link',
+                    function () {
+                        var id = $(this).attr("data-id");
+                        $.ajax({
+                            url: '/json/appointment/details/' + id,
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function (data) {
+                                $("#form")[0].reset();
+                                $("#myModal").modal('show');
+                                $("#ID").val(data.data[0].ID);
+                                $("#StudentId").val(data.data[0].StudentId);
+                                $("#TeacherId").select2("trigger",
+                                    "select",
+                                    { data: { text: data.data[0].Teacher, id: data.data[0].TeacherId } });
+
+                                $("#std").html(data.data[0].Student);
+                                $("#createdDate").html("İSTEK TARİHİ: " + new Date(parseInt(data.data[0].CreatedDate.substr(6))).format("dd.mm.yyyy"));
+                                $("#stdMessage").html(data.data[0].StudentMessage);
+                                if (data.data[0].Status === "Kapat" || data.data[0].Status === "Red") {
+                                    $("#Status").attr("disabled", true);
+                                    $('button[type=submit]').hide();
+                                    $(".model-title").html("Randevu Detayı");
+                                } else {
+                                    $("#Status").attr("disabled", false);
+                                    $('button[type=submit]').show();
+                                    $(".model-title").html("Güncelle");
+                                }
+                                $("#Status").val(data.data[0].Status).trigger('change');
+
+                                if (data.data[0].TeacherMessage != null) {
+                                    $('#TeacherMessage').summernote('code', data.data[0].TeacherMessage);
+                                }
+                                if (data.data[0].Date != null) {
+
+                                    $('#Date').prop('value', function () {
+                                        var value = new Date(parseInt(data.data[0].Date.substr(6)));
+                                        value.setDate(value.getDate());
+                                        return value.toISOString().split('T')[0];
+                                    });
+                                }
+                                if (data.data[0].Time != null) {
+                                    $("#Time").val(data.data[0].Time);
+                                }
+                                //var value = new Date(parseInt(data.data[0].CreatedDate.substr(6)));
+                                //value.setDate(value.getDate() + 1);
+                            },
+                            error: function (err) {
+                                alert("Error: " + err.responseText);
+                            }
+                        });
+
+
+                    });
+
+            });
+        </script>
+    }
+    else
+    {
+        <script>
+            $(document).ready(function() {
+
+                $('#examples').DataTable({
+                    "ajax": {
+                        "url": "/json/appointment/",
+                        "type": "GET",
+                        "datatype": "json"
+                    },
+                    "paging": false,
+                    responsive: true,
+                    "columns": [
+                        { "width": "2%", "title": "#ID", "data": "ID" },
+                        {
+                            "title": "İstek Tarihi",
+                            "data": "CreatedDate",
+                            "autoWidth": true,
+                            "searchable": true,
+                            "sortable": true,
+                            "processing": true,
+                            "serverSide": true,
+                            "render": function(data, type, full, meta) {
+                                return new Date(parseInt(full.CreatedDate.substr(6))).format("dd.mm.yyyy");
+                            }
+                        },
+                        { "autoWidth": true, "title": "Öğrenci", "data": "Student" },
+                        {
+                            "title": "Randevu Durumu",
+                            "data": "Status",
+                            "autoWidth": true,
+                            "searchable": true,
+                            "sortable": true,
+                            "processing": true,
+                            "serverSide": true,
+                            "render": function(data, type, full, meta) {
+                                if (data === "Onay Bekleniyor") {
+                                    return '<span class="badge badge-info d-block">Onay Bekliyor</span>';
+                                } else if (data === "Kabul") {
+                                    return '<span class="badge badge-success d-block">Kabul Edildi</span>';
+                                } else if (data === "Red") {
+                                    return '<span class="badge badge-danger d-block">Reddedildi</span>';
+                                } else if (data === "Kapat") {
+                                    return '<span class="badge badge-warning d-block">Kapandı</span>';
+                                } else {
+                                    return "";
+                                }
+                            }
+                        },
+                        {
+
+                            "render": function (data, type, full, meta) {
+                                return '<a class="update-link badge badge-info d-block" href="#" data-id='+full.ID+'><i class="icon-eye"></i> Görüntüle </a>';
+                            }
+                        },
+                        {
+
+                            "render": function (data, type, full, meta) {
+                                return '<a class="delete-link badge badge-warning d-block" href="#" data-id='+full.ID+'><i class="icon-database-remove"></i> Sil</a>';
+                            }
+                        }
+                    ],
+                    columnDefs: [{
+                        width: 100
+                    }],
+                    dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+                    "language":
+                    {
+                        "url":
+                            "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Turkish.json"
+                    }
+                });
+
+
+
+                $('#examples tbody').on('click',
+                    'a.update-link',
+                    function () {
+                        var id = $(this).attr("data-id");
+                        $.ajax({
+                            url: '/json/appointment/details/' + id,
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function (data) {
+
+                                $("#form")[0].reset();
+
+                                $("#ID").val(data.data[0].ID);
+                                $("#StudentId").val(data.data[0].StudentId);
+                                $("#TeacherId").select2("trigger",
+                                    "select",
+                                    { data: { text: data.data[0].Teacher, id: data.data[0].TeacherId } });
+
+                                $("#std").html(data.data[0].Student);
+                                $("#createdDate").html("İSTEK TARİHİ: " + new Date(parseInt(data.data[0].CreatedDate.substr(6))).format("dd.mm.yyyy"));
+                                $("#stdMessage").html(data.data[0].StudentMessage);
+
+                                $("#Status").attr("disabled", true);
+                                $('button[type=submit]').hide();
+                                $(".model-title").html("Randevu Detayı");
+
+                                $("#Status").val(data.data[0].Status).trigger('change');
+
+                                if (data.data[0].TeacherMessage != null) {
+                                    $('#TeacherMessage').summernote('code', data.data[0].TeacherMessage);
+                                }
+                                if (data.data[0].Date != null) {
+
+                                    $('#Date').prop('value', function () {
+                                        var value = new Date(parseInt(data.data[0].Date.substr(6)));
+                                        value.setDate(value.getDate());
+                                        return value.toISOString().split('T')[0];
+                                    });
+                                }
+                                if (data.data[0].Time != null) {
+                                    $("#Time").val(data.data[0].Time);
+                                }
+
+                                $("#myModal").modal('show');
+
+                                
+                            },
+                            error: function (err) {
+                                alert("Error: " + err.responseText);
+                            }
+                        });
+                    });
+
+                $('#examples tbody').on('click',
+                    'a.delete-link',
+                    function () {
+                        var id = $(this).attr("data-id");
+                        iziToast.question({
+                            timeout: 20000,
+                            close: false,
+                            overlay: true,
+                            displayMode: 'once',
+                            id: 'question',
+                            zindex: 999,
+                            title: 'Dikkat',
+                            message: 'Silmek istediğinize emin misiniz?',
+                            position: 'center',
+                            buttons: [
+                                [
+                                    '<button><b>Evet</b></button>', function (instance, toast) {
+                                        $.ajax({
+                                            type: "POST",
+                                            url: '/appointment/delete/' + id,
+                                            success: function (response) {
+                                                if (response === "Success") {
+                                                    $.iziToast.Success();
+                                                    $("#examples").DataTable().ajax.reload();
+                                                } else {
+                                                    $.iziToast.Warning();
+                                                }
+                                            }
+                                        });
+                                        instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                                    }, true
+                                ],
+                                [
+                                    '<button>Hayır</button>', function (instance, toast) {
+
+                                        instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                                    }
+                                ]
+                            ]
+                        });
+
+                    });
+            });
+        </script>
+    }
 }

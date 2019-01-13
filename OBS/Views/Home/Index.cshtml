@@ -1,178 +1,179 @@
-﻿<!-- Content area -->
-<div class="d-md-flex align-items-md-start">
+﻿@if (User.Identity.IsAuthenticated)
+{
+    <div class="d-md-flex align-items-md-start">
 
-    <!-- Left sidebar component -->
-    <!-- /left sidebar component -->
-    <!-- Right content -->
-    <div class="tab-content w-100 overflow-auto">
-        <div class="tab-pane fade active show" id="profile">
+        <!-- Left sidebar component -->
+        <!-- /left sidebar component -->
+        <!-- Right content -->
+        <div class="tab-content w-100 overflow-auto">
+            <div class="tab-pane fade active show" id="profile">
 
-            <!-- Basic card -->
-            <div class="card">
-                <div class="card-header header-elements-inline">
-                    <h5 class="card-title">Hoşgeldiniz, @Session["userName"] </h5>
+                <!-- Basic card -->
+                <div class="card">
+                    <div class="card-header header-elements-inline">
+                        <h5 class="card-title">Hoşgeldiniz, @Session["userName"] </h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Session["roleName"] != null && Session["roleName"].ToString() != "Admin")
+                        {
+                            <div class="row">
+
+                                <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
+                                    <a href="/announcement">
+                                        <div class="card card-body bg-orange-400 has-bg-image">
+                                            <div class="media">
+                                                <div class="mr-3 align-self-center">
+                                                    <i class="icon-megaphone icon-3x opacity-75"></i>
+                                                </div>
+                                                <div class="media-body text-right">
+                                                    <h3 class="mb-0">Duyurular </h3>
+                                                    <span class="text-uppercase font-size-xs"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
+                                    <a href="/class/schedule">
+                                        <div class="card card-body bg-success-400 has-bg-image">
+                                            <div class="media">
+                                                <div class="mr-3 align-self-center">
+                                                    <i class="icon-calendar22 icon-3x opacity-75"></i>
+                                                </div>
+                                                <div class="media-body text-right">
+                                                    <h4 class="mb-0">Ders Programı</h4>
+                                                    <span class="font-size-lg"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
+                                    <a href="/exam">
+                                        <div class="card card-body bg-brown-400 has-bg-image">
+                                            <div class="media">
+                                                <div class="mr-3 align-self-center">
+                                                    <i class="icon-pencil7 icon-3x opacity-75"></i>
+                                                </div>
+                                                <div class="media-body text-right">
+                                                    <h3 class="mb-0">Sınav Notları </h3>
+                                                    <span class="text-uppercase font-size-xs"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
+                                    <a href="/absenteeism">
+                                        <div class="card card-body bg-success-400 has-bg-image">
+                                            <div class="media">
+                                                <div class="mr-3 align-self-center">
+                                                    <i class="icon-calendar52 icon-3x opacity-75"></i>
+                                                </div>
+                                                <div class="media-body text-right">
+                                                    <h4 class="mb-0">Devamsızlık</h4>
+                                                    <span class="text-uppercase font-size-xs"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+
+                            </div>
+                            <div class="row">
+
+                                <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
+                                    <a href="/homework">
+                                        <div class="card card-body bg-indigo-400 has-bg-image">
+                                            <div class="media">
+                                                <div class="mr-3 align-self-center">
+                                                    <i class="icon-pen6 icon-3x opacity-75"></i>
+                                                </div>
+                                                <div class="media-body text-right">
+                                                    <h3 class="mb-0">Ödevler </h3>
+                                                    <span class="text-uppercase font-size-xs"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
+                                    <a href="/appointment">
+                                        <div class="card card-body bg-warning-400 has-bg-image">
+                                            <div class="media">
+                                                <div class="mr-3 align-self-center">
+                                                    <i class="icon-calendar5 icon-3x opacity-75"></i>
+                                                </div>
+                                                <div class="media-body text-right">
+                                                    <h4 class="mb-0">Randevu</h4>
+                                                    <span class="font-size-lg"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
+                                    <a href="/user/profile">
+                                        <div class="card card-body bg-slate-400 has-bg-image">
+                                            <div class="media">
+                                                <div class="mr-3 align-self-center">
+                                                    <i class="icon-cog icon-3x opacity-75"></i>
+                                                </div>
+                                                <div class="media-body text-right">
+                                                    <h4 class="mb-0">Hesap Bilgileri </h4>
+                                                    <span class="text-uppercase font-size-xs"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
+                                    <a href="/user/changepassword">
+                                        <div class="card card-body bg-danger-400 has-bg-image">
+                                            <div class="media">
+                                                <div class="mr-3 align-self-center">
+                                                    <i class="icon-reset icon-3x opacity-75"></i>
+                                                </div>
+                                                <div class="media-body text-right">
+                                                    <h4 class="mb-0">Şifreyi Değiştir</h4>
+                                                    <span class="text-uppercase font-size-xs"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+
+                            </div>
+
+                        }
+                        else
+                        {
+                            <div class="row" id="countRow">
+
+                            </div>
+                        }
+                    </div>
                 </div>
-                <div class="card-body">
-                    @if (Session["roleName"].ToString() != "Admin")
-                    {
-                        <div class="row">
+                <!-- /basic card -->
 
-                            <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
-                                <a href="/announcement">
-                                    <div class="card card-body bg-orange-400 has-bg-image">
-                                        <div class="media">
-                                            <div class="mr-3 align-self-center">
-                                                <i class="icon-megaphone icon-3x opacity-75"></i>
-                                            </div>
-                                            <div class="media-body text-right">
-                                                <h3 class="mb-0">Duyurular </h3>
-                                                <span class="text-uppercase font-size-xs"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
-                                <a href="/class/schedule">
-                                    <div class="card card-body bg-success-400 has-bg-image">
-                                        <div class="media">
-                                            <div class="mr-3 align-self-center">
-                                                <i class="icon-calendar22 icon-3x opacity-75"></i>
-                                            </div>
-                                            <div class="media-body text-right">
-                                                <h4 class="mb-0">Ders Programı</h4>
-                                                <span class="font-size-lg"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
-                                <a href="#">
-                                    <div class="card card-body bg-brown-400 has-bg-image">
-                                        <div class="media">
-                                            <div class="mr-3 align-self-center">
-                                                <i class="icon-pencil7 icon-3x opacity-75"></i>
-                                            </div>
-                                            <div class="media-body text-right">
-                                                <h3 class="mb-0">Sınav Notları </h3>
-                                                <span class="text-uppercase font-size-xs"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-
-                            <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
-                                <a href="#">
-                                    <div class="card card-body bg-success-400 has-bg-image">
-                                        <div class="media">
-                                            <div class="mr-3 align-self-center">
-                                                <i class="icon-calendar52 icon-3x opacity-75"></i>
-                                            </div>
-                                            <div class="media-body text-right">
-                                                <h3 class="mb-0">Sınav Tarihleri </h3>
-                                                <span class="text-uppercase font-size-xs"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-
-                        </div>
-                        <div class="row">
-
-                            <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
-                                <a href="/homework">
-                                    <div class="card card-body bg-indigo-400 has-bg-image">
-                                        <div class="media">
-                                            <div class="mr-3 align-self-center">
-                                                <i class="icon-pen6 icon-3x opacity-75"></i>
-                                            </div>
-                                            <div class="media-body text-right">
-                                                <h3 class="mb-0">Ödevler </h3>
-                                                <span class="text-uppercase font-size-xs"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
-                                <a href="/appointment">
-                                    <div class="card card-body bg-warning-400 has-bg-image">
-                                        <div class="media">
-                                            <div class="mr-3 align-self-center">
-                                                <i class="icon-calendar5 icon-3x opacity-75"></i>
-                                            </div>
-                                            <div class="media-body text-right">
-                                                <h4 class="mb-0">Randevu</h4>
-                                                <span class="font-size-lg"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
-                                <a href="/user/profile">
-                                    <div class="card card-body bg-slate-400 has-bg-image">
-                                        <div class="media">
-                                            <div class="mr-3 align-self-center">
-                                                <i class="icon-cog icon-3x opacity-75"></i>
-                                            </div>
-                                            <div class="media-body text-right">
-                                                <h4 class="mb-0">Hesap Bilgileri </h4>
-                                                <span class="text-uppercase font-size-xs"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-
-                            <div class="col-sm-6 col-xl-3 col-md-6 col-xs-12">
-                                <a href="/user/changepassword">
-                                    <div class="card card-body bg-danger-400 has-bg-image">
-                                        <div class="media">
-                                            <div class="mr-3 align-self-center">
-                                                <i class="icon-reset icon-3x opacity-75"></i>
-                                            </div>
-                                            <div class="media-body text-right">
-                                                <h4 class="mb-0">Şifreyi Değiştir</h4>
-                                                <span class="text-uppercase font-size-xs"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-
-                        </div>
-
-                    }
-                    else
-                    {
-                        <div class="row" id="countRow">
-
-                        </div>
-                    }
-                </div>
             </div>
-            <!-- /basic card -->
-
         </div>
+        <!-- /right content -->
+
     </div>
-    <!-- /right content -->
-
-</div>
 
 
-<!-- /content area -->
+    <!-- /content area -->
 
 @section scripts{
 
-    @if (Session["roleName"].ToString() == "Admin")
+    @if (Session["roleName"] != null && Session["roleName"].ToString() == "Admin")
     {
 
         <script type="text/javascript">
-            var countHTML = '<div class="col-sm-6 col-xl-4">' +
+            var countHTML = '<div class="col-sm-6 col-xl-4"><a href="linkUrl">' +
                 '                                <div class="card card-body arkaplanClass has-bg-image">' +
                 '                                    <div class="media">' +
                 '                                        <div class="media-body">' +
@@ -185,22 +186,23 @@
                 '                                        </div>' +
                 '                                    </div>' +
                 '                                </div>' +
-                '                            </div>';
+                '                           </a> </div>';
 
 
-            $(document).ready(function () {
+            $(document).ready(function() {
                 var list = [];
 
                 $.getJSON('/statistics',
                     function(json) {
                         $.each(json,
-                            function (i, value) {
+                            function(i, value) {
                                 if (value.StudentCount) {
                                     var res;
                                     res = countHTML.replace("Count", value.StudentCount);
                                     res = res.replace("TEXT", "TOPLAM ÖĞRENCİ SAYISI");
                                     res = res.replace("arkaplanClass", "bg-indigo-400");
                                     res = res.replace("getIcon", "icon-pencil4");
+                                    res = res.replace("linkUrl", "/students");
                                     list.push(res);
                                 }
                                 if (value.TeacherCount) {
@@ -209,6 +211,7 @@
                                     res = res.replace("TEXT", "TOPLAM ÖĞRETMEN SAYISI");
                                     res = res.replace("arkaplanClass", "bg-warning-400");
                                     res = res.replace("getIcon", "icon-users4");
+                                    res = res.replace("linkUrl", "/teachers");
                                     list.push(res);
                                 }
                                 if (value.AnnouncementCount) {
@@ -217,14 +220,16 @@
                                     res = res.replace("TEXT", "TOPLAM DUYURU SAYISI");
                                     res = res.replace("arkaplanClass", "bg-teal-400");
                                     res = res.replace("getIcon", "icon-megaphone");
+                                    res = res.replace("linkUrl", "/announcement");
                                     list.push(res);
                                 }
                                 if (value.ClassCount) {
                                     var res;
                                     res = countHTML.replace("Count", value.ClassCount);
-                                    res = res.replace("TEXT", "TOPLAM DERS SAYISI");
+                                    res = res.replace("TEXT", "TOPLAM SINIF SAYISI");
                                     res = res.replace("arkaplanClass", "bg-pink-400");
                                     res = res.replace("getIcon", "icon-books");
+                                    res = res.replace("linkUrl", "/class");
                                     list.push(res);
                                 }
                                 if (value.LessonCount) {
@@ -233,6 +238,7 @@
                                     res = res.replace("TEXT", "TOPLAM DERS SAYISI");
                                     res = res.replace("arkaplanClass", "bg-orange-400");
                                     res = res.replace("getIcon", "icon-book");
+                                    res = res.replace("linkUrl", "/lessons");
                                     list.push(res);
                                 }
                                 if (value.HomeWorkCount) {
@@ -241,6 +247,7 @@
                                     res = res.replace("TEXT", "ÖĞRENCİLERE VERİLEN ÖDEV SAYISI");
                                     res = res.replace("arkaplanClass", "bg-info-700");
                                     res = res.replace("getIcon", "icon-pencil7");
+                                    res = res.replace("linkUrl", "/homework");
                                     list.push(res);
                                 }
                             });
@@ -251,4 +258,4 @@
         </script>
 
     }
-}
+}}

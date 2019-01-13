@@ -30,7 +30,7 @@
                     <div class="card-header">
                         @if (Session["roleName"].ToString() == "Student")
                         {
-                        <button id="allDisplay" type="button" class="btn btn-primary mt-1">  <span class="badge bg-grey-800 badge-pill" id="allCount"></span>&nbsp; <i class="icon-megaphone"></i>&nbsp; Hepsini Göster</button>
+                            <button id="allDisplay" type="button" class="btn btn-primary mt-1">  <span class="badge bg-grey-800 badge-pill" id="allCount"></span>&nbsp; <i class="icon-megaphone"></i>&nbsp; Hepsini Göster</button>
 
                             <button id="allClass" type="button" class="btn btn-success pull-right mt-1">  <span class="badge bg-grey-800 badge-pill" id="classCount"></span> &nbsp; Sınıf &nbsp;  <i class="icon-pencil6"></i> </button>
                             <button id="allLesson" type="button" class="btn btn-default bg-indigo mt-1 pull-right"> <span class="badge bg-grey-800 badge-pill" id="lessonCount"></span> &nbsp; Ders &nbsp;  <i class="icon-books"></i> </button>
@@ -169,7 +169,7 @@ else
                         @if (Session["roleName"].ToString() == "Admin")
                         {
 
-                            <div class="col-md-6">
+                            <div id="chkGenelDiv" class="col-md-6">
                                 <div class="form-check form-check-switch form-check-switch-left">
                                     <label id="schk" class="form-check-label">
                                         <input type="checkbox" data-toggle="toggle" id="chkGenel" data-on="Evet" checked="checked" disabled="disabled" data-off="Hayır">
@@ -210,7 +210,7 @@ else
                                     <select id="ClassId" class="form-control select-fixed-single"></select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div id="checkDers" class="col-md-6">
                                 <div class="form-check form-check-switch form-check-switch-left">
                                     <label id="schk" class="form-check-label">
                                         <input type="checkbox" data-toggle="toggle" id="chkDers" data-on="Evet" data-off="Hayır">
@@ -238,18 +238,18 @@ else
 @section scripts{
 
 
-    <link href="~/Content/assets/css/bootstrap-toggle.min.css" rel="stylesheet"/>
+    <link href="~/Content/assets/css/bootstrap-toggle.min.css" rel="stylesheet" />
     <script src="~/Content/assets/js/bootstrap-toggle.min.js"></script>
 
     <!-- include summernote css/js -->
- 
+
     <script type="text/javascript">
         $(document).ready(function() {
             var role = "@Session["roleName"].ToString()";
             if (role === "Admin") {
                 function getAnnouncement() { }
             }
-          
+
             $('#myModal').on('shown.bs.modal',
                 function() {
                     $('#summernote').summernote({
@@ -286,29 +286,26 @@ else
             });
 
             $("#allDisplay").click(function() {
-                $("#announcementStudent").show().addClass('animated fadeInUp');
-                $("#announcementClass").show().addClass('animated fadeInUp');
-                $("#announcementAll").show().addClass('animated fadeInUp');
-                $("#announcementLesson").show().addClass('animated fadeInUp');
+                $("#announcementStudent").show();
+                $("#announcementClass").show();
+                $("#announcementAll").show();
+                $("#announcementLesson").show();
             });
 
             $("#allStudent").click(function() {
-                $("#announcementStudent").removeClass('animated fadeInUp');
-                $("#announcementStudent").show().addClass('animated fadeInUp');
+                $("#announcementStudent").show();
                 $("#announcementClass").hide();
                 $("#announcementAll").hide();
                 $("#announcementLesson").hide();
             });
             $("#allLesson").click(function() {
-                $("#announcementLesson").removeClass('animated fadeInUp');
-                $("#announcementLesson").show().addClass('animated fadeInUp');
+                $("#announcementLesson").show();
                 $("#announcementClass").hide();
                 $("#announcementAll").hide();
                 $("#announcementStudent").hide();
             });
             $("#allClass").click(function() {
-                $("#announcementClass").removeClass('animated fadeInUp');
-                $("#announcementClass").show().addClass('animated fadeInUp');
+                $("#announcementClass").show();
                 $("#announcementLesson").hide();
                 $("#announcementAll").hide();
                 $("#announcementStudent").hide();
@@ -341,6 +338,7 @@ else
             $('#chkOgrenci').change(function() {
                 if (this.checked) {
                     $("#checkSinif").hide();
+                    $("#checkDers").hide();
                     $("#ogrenciSelect2").show();
                     $('#chkSinif').prop('checked', false).change();
                     $('#chkDers').prop('checked', false).change();
@@ -349,6 +347,7 @@ else
                 } else {
                     $("#StudentId").val(null).trigger('change');
                     $("#checkSinif").show();
+                    $("#checkDers").hide();
                     $("#ogrenciSelect2").hide();
                 }
             });
@@ -356,8 +355,10 @@ else
             $('#chkSinif').change(function() {
                 if (this.checked) {
                     $("#sinifSelect2").show();
+                    $("#checkDers").show();
                 } else {
                     $("#sinifSelect2").hide();
+                    $("#checkDers").hide();
                     $("#ClassId").val(null).trigger('change');
                 }
             });
@@ -371,7 +372,7 @@ else
                 }
             });
 
-          
+
             $("form").submit(function(e) {
                 e.preventDefault();
 
@@ -382,7 +383,11 @@ else
                 }
                 data.Title = $('#title').val();
                 data.Description = $('#summernote').summernote('code');
-                data.AllUser = $("#chkGenel").prop('checked');
+                if ($("#chkGenel").prop('checked') === true) {
+                    data.AllUser = true;
+                } else {
+                    data.AllUSer = false;
+                }
                 if ($("#chkOgrenci").prop('checked') === true) {
                     data.StudentId = $("#StudentId").val();
                 }
@@ -393,35 +398,53 @@ else
                     data.ClassId = $("#ClassId").val();
                 }
                 data.CreatedByID = @Session["userId"];
-                $.ajax({
-                    type: "POST",
-                    url: "/announcement/add",
-                    data: JSON.stringify(data),
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    success: function(response) {
-                        if (response === "Success") {
-                            $.iziToast.Success();
-                            $("#examples").DataTable().ajax.reload();
-                            $("#myModal").modal('hide');
-                        } else if (response === "Update") {
-                            $.iziToast.Success();
-                            $("#examples").DataTable().ajax.reload();
-                            $("#myModal").modal('hide');
-                        }else if (response === "NoChanges") {
-                            $.iziToast.Info("Herhangi bir değişiklik yapılmadı.");
-                        } else {
-                            $.iziToast.Warning();
-                            alert(response);
-                        }
-                    },
-                    failure: function(response) {
-                        alert(response.responseText);
-                    },
-                    error: function(response) {
-                        alert(response.responseText);
+
+
+                if ($("#chkGenel").prop('checked') === false) {
+                    $.iziToast.Info("Sadece genel duyuru ekleyebilirsiniz.");
+                } else if ($("#chkOgrenci").prop('checked') === true) {
+                    if ($("#StudentId").val() <= 0) {
+                        $.iziToast.Info("Lütfen öğrenci seçiniz.");
                     }
-                });
+                } else if ($("#chkDers").prop('checked') === true && $("#LessonId").val() <= 0) {
+                  $.iziToast.Info("Lütfen ders seçiniz.");
+
+                } else if ($("#chkSinif").prop('checked') === true && $("#ClassId").val() <= 0) {
+                        $.iziToast.Info("Lütfen sınıf seçiniz.");
+                } else if ($("#chkDers").prop('checked') === false && $("#chkSinif").prop('checked') === false && $("#chkSinif").prop('checked') === false ) {
+                     $.iziToast.Info("Lütfen duyuru kitlesini seçiniz.");
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "/announcement/add",
+                        data: JSON.stringify(data),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function(response) {
+                            if (response === "Success") {
+                                $.iziToast.Success();
+                                $("#examples").DataTable().ajax.reload();
+                                $("#myModal").modal('hide');
+                            } else if (response === "Update") {
+                                $.iziToast.Success();
+                                $("#examples").DataTable().ajax.reload();
+                                $("#myModal").modal('hide');
+                            }else if (response === "NoChanges") {
+                                $.iziToast.Info("Herhangi bir değişiklik yapılmadı.");
+                            } else {
+                                $.iziToast.Warning();
+                                alert(response);
+                            }
+                        },
+                        failure: function(response) {
+                            alert(response.responseText);
+                        },
+                        error: function(response) {
+                            alert(response.responseText);
+                        }
+                    });
+                }
+
             });
 
 
@@ -433,10 +456,10 @@ else
         <script type="text/javascript">
             $(document).ready(function() {
                 getAnnouncement();
-         
+
             function getAnnouncement() {
                 $("#duyurular").empty();
-                var announcement = '<div id="duyuruTipi" class="timeline-row">' +
+                var announcement = '<div id="duyuruTipi" class="duyuruTipi timeline-row">' +
                     '<div class="timeline-icon">' +
                     '<div class="arkaplanClass">' +
                     '<i class="timelineIcon"></i>' +
@@ -526,18 +549,23 @@ else
                                 }
                             });
                         document.getElementById('duyurular').innerHTML = list.join("");
-                        $('body').loading('stop');
-                        var lessonCount = ($("#announcementLesson").length > 0) ? $("#announcementLesson").length : 0;
-                        var studentCount = ($("#announcementStudent").lenght > 0) ? $("#announcementStudent").lenght : 0;
-                        var classCount = ($("#announcementClass").length > 0 ? $("#announcementClass").length : 0);
-                        var allCount = $("#allCount").length + classCount + lessonCount + studentCount;
+
+                        var lessonCount = ($("div[id=announcementLesson]").length.length > 0) ? $("div[id=announcementLesson]").length : 0;
+                        var studentCount = ($("div[id=announcementStudent]").length > 0) ? $("div[id=announcementStudent]").length : 0;
+                        var classCount = ($("div[id=announcementClass]").length > 0) ? $("div[id=announcementClass]").length : 0;
+                        var allCount = $("div[id=announcementAll]").length + classCount + lessonCount + studentCount;
                         $("#lessonCount").html(lessonCount);
                         $("#studentCount").html(studentCount);
                         $("#classCount").html(classCount);
                         $("#allCount").html(allCount);
+                        $('body').loading('stop');
+
+
+
                     });
                 }
-              
+
+
             });
         </script>
     }
@@ -545,7 +573,7 @@ else
     {
         <script type="text/javascript">
             $(document).ready(function() {
-                
+
 
                 $('#examples').DataTable({
                     "ajax": {
@@ -681,14 +709,21 @@ else
                             type: 'GET',
                             dataType: 'json',
                             success: function(data) {
-                                $(".modal-title").html("Güncelle");
+                                $(".modal-title").html("Düzenle");
                                 $("#ID").val(data.data[0].ID);
 
                                 $('#title').val(data.data[0].Title);
                                 $('#summernote').summernote('code', data.data[0].Description);
+
                                 if (data.data[0].AllUser === true) {
+                                    $('button[type=submit]').show();
+                                    $("#chkGenelDiv").show();
                                     $("#chkGenel").prop('checked');
+                                } else {
+                                    $('button[type=submit]').hide();
+                                    $("#chkGenelDiv").hide();
                                 }
+                                
 
                                 if (data.data[0].StudentId !== null) {
                                     $("#Studentd").select2("trigger",
