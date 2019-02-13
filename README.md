@@ -26,5 +26,5 @@ It is a student information system. It is a management information system that c
 - JavaScript
 - jQuery
 - JSON
-- JSON Localization
+- JSON Localization (coming soon)
 - Bootstrap 4
