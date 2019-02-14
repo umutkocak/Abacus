@@ -21,10 +21,24 @@ It is a student information system. It is a management information system that c
 - IDE: Visual Studio 2017
 - Database: SQL Server 2017
 - ASP.NET MVC
- - ASP.NET Custom Authentication
+ - Custom Authentication
+ - .NET SMTP
 - Entity Framework (DB First)
 - JavaScript
 - jQuery
 - JSON
 - JSON Localization (coming soon)
 - Bootstrap 4
+
+## ➡️ Login Information:
+
+username : admin 
+password : admin
+
+username : student 
+password : student
+
+username : teacher 
+password : teacher
+
+
