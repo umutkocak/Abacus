@@ -1739,9 +1739,6 @@ namespace OBS.Controllers
                                 smtp.Credentials = new NetworkCredential("abakusbilgisistemi@hotmail.com", "abakus.123");
                                 smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
                                 smtp.Send(message);
-
-
-
                             }
                         }
                         status = "Success";
